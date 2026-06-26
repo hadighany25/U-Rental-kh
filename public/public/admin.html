@@ -1,0 +1,2243 @@
+<!doctype html>
+<html lang="km">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enterprise Admin - U-Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kantumruy+Pro:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script
+      src="https://unpkg.com/html5-qrcode"
+      type="text/javascript"
+    ></script>
+
+    <style>
+      body {
+        font-family: "Inter", "Kantumruy Pro", sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+      }
+      .tab-content {
+        display: none;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+      }
+      .tab-content.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Live Validation Banner */
+      .live-error-banner {
+        display: none;
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .slot-tag {
+        background: #fff;
+        border: 1px solid #fcd34d;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        font-size: 11px;
+        margin: 3px;
+        color: #d97706;
+        font-weight: 600;
+      }
+
+      /* Clean Table */
+      .clean-table th {
+        background: transparent;
+        color: #64748b;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+      }
+      .clean-table td {
+        border-bottom: 1px dashed #f1f5f9;
+        padding: 16px 12px;
+      }
+      .clean-table tr:hover td {
+        background: #f8fafc;
+      }
+
+      /* Print Settings */
+      @media print {
+        body * {
+          visibility: hidden !important;
+        }
+        #printableBoardingPass,
+        #printableBoardingPass * {
+          visibility: visible !important;
+        }
+        #printableBoardingPass {
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          max-width: 850px;
+          z-index: 9999;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="flex h-screen overflow-hidden">
+    <div
+      id="toastAlert"
+      class="fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform translate-x-full opacity-0 bg-slate-800 text-white"
+    >
+      <span id="toastMsg" class="font-medium text-sm"
+        >✅ សារជូនដំណឹងនៅទីនេះ!</span
+      >
+    </div>
+
+    <div
+      id="customConfirmModal"
+      class="fixed inset-0 z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeConfirm()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform duration-300"
+        id="confirmBox"
+      >
+        <div
+          id="confirmIcon"
+          class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl"
+        >
+          ❓
+        </div>
+        <h3
+          class="text-xl font-bold text-center text-slate-800 mb-2"
+          id="confirmTitle"
+        >
+          Confirm Action
+        </h3>
+        <p
+          class="text-center text-slate-500 text-sm font-medium mb-6"
+          id="confirmText"
+        >
+          Are you sure?
+        </p>
+        <div class="flex justify-center gap-3">
+          <button
+            onclick="closeConfirm()"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 w-full transition"
+          >
+            Cancel
+          </button>
+          <button
+            id="confirmBtn"
+            class="px-5 py-2.5 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition"
+          >
+            Yes, Do it
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <aside
+      class="w-[260px] bg-[#0B1120] text-slate-400 flex flex-col no-print z-20"
+    >
+      <div class="h-20 flex items-center px-8 border-b border-slate-800/50">
+        <h1 class="text-2xl font-bold text-white">
+          <span class="text-[#3B82F6]">U-</span>Rental
+        </h1>
+      </div>
+      <div class="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+        <div>
+          <p
+            class="px-4 text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase mb-3"
+          >
+            Main Menu
+          </p>
+          <div class="space-y-1">
+            <button
+              onclick="switchTab('overview')"
+              id="nav-overview"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
+            >
+              <svg
+                class="w-5 h-5 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                ></path>
+              </svg>
+              Overview
+            </button>
+            <button
+              onclick="switchTab('booking')"
+              id="nav-booking"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
+            >
+              <svg
+                class="w-5 h-5 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path>
+              </svg>
+              Booking
+            </button>
+            <button
+              onclick="switchTab('floorplan')"
+              id="nav-floorplan"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
+            >
+              <svg
+                class="w-5 h-5 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
+                ></path>
+              </svg>
+              Floorplan
+            </button>
+            <button
+              onclick="switchTab('guestlist')"
+              id="nav-guestlist"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
+            >
+              <svg
+                class="w-5 h-5 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+              Guest Database
+            </button>
+          </div>
+        </div>
+        <div>
+          <p
+            class="px-4 text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase mb-3"
+          >
+            Security & Support
+          </p>
+          <div class="space-y-1">
+            <button
+              onclick="showSupportInfo()"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
+            >
+              <svg
+                class="w-5 h-5 opacity-70"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+              contacts
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-800/50">
+        <a
+          href="#"
+          onclick="
+            event.preventDefault();
+            triggerConfirm('logout', 'index.html');
+          "
+          class="flex items-center justify-center gap-2 w-full px-4 py-3 text-slate-400 hover:text-white rounded-xl transition duration-300 font-bold text-sm"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            ></path>
+          </svg>
+          logout
+        </a>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+      <header
+        class="h-20 bg-white px-8 flex justify-between items-center sticky top-0 z-10 border-b border-slate-100 no-print"
+      >
+        <div class="flex items-center gap-4">
+          <span
+            class="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-[11px] border border-emerald-100 font-bold"
+            ><span class="relative flex h-2 w-2"
+              ><span
+                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+              ></span
+              ><span
+                class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
+              ></span
+            ></span>
+            Live Sync</span
+          >
+          <span class="text-slate-400 text-sm pl-4 border-l border-slate-200"
+            >ម៉ោងបច្ចុប្បន្នភាពចុងក្រោយ</span
+          >
+        </div>
+        <div class="flex items-center gap-4 font-bold text-sm text-slate-700">
+          <span class="text-slate-400 font-normal mr-2">មាតិកាក្រោយការ</span>
+          <div
+            class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 overflow-hidden"
+          >
+            <img
+              src="https://ui-avatars.com/api/?name=Admin&background=E2E8F0&color=475569"
+              alt="User"
+            />
+          </div>
+          Admin
+          <svg
+            class="w-4 h-4 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            ></path>
+          </svg>
+        </div>
+      </header>
+
+      <div class="p-8">
+        <div id="overview" class="tab-content active">
+          <h2 class="text-xl font-bold text-slate-800 mb-6" id="headerTitle">
+            Platform Overview
+          </h2>
+
+          <div
+            class="bg-[#EEF2FF] rounded-[16px] p-6 mb-6 flex flex-col md:flex-row items-center justify-between border border-[#E0E7FF] relative overflow-hidden"
+          >
+            <div class="relative z-10 text-center md:text-left mb-4 md:mb-0">
+              <h2 class="text-slate-800 text-lg font-bold mb-1">
+                ពិនិត្យសំបុត្រភ្ញៀវយ៉ាងរហ័ស
+              </h2>
+              <p class="text-slate-600 text-[13px] mb-4">
+                មានអ្នកកក់ជាច្រើនយប់ក្នុងកាលវិភាគ Verify Guest Ticket Quickly
+              </p>
+              <button
+                onclick="openScanner()"
+                class="bg-[#2563EB] hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-xl shadow-md transition text-xs"
+              >
+                Open Scanner
+              </button>
+            </div>
+            <div class="relative z-10 hidden md:block">
+              <div class="flex items-center gap-3">
+                <div
+                  class="bg-white border border-slate-200 rounded-xl shadow-sm rotate-[-15deg] transform translate-x-6 overflow-hidden w-28 opacity-80"
+                >
+                  <div class="bg-[#E11D48] h-3 w-full"></div>
+                  <div class="p-2 text-center">
+                    <div class="text-[8px] font-bold text-slate-400 mb-1">
+                      U-RENTAL
+                    </div>
+                    <div
+                      class="text-xs font-black tracking-[0.2em] text-slate-800"
+                    >
+                      ||| | |||
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-white border border-slate-200 rounded-xl shadow-lg relative z-10 overflow-hidden w-36"
+                >
+                  <div
+                    class="bg-[#E11D48] text-white text-[8px] font-bold px-2 py-1 flex justify-between"
+                  >
+                    <span>BOOKING</span><span>U-RENTAL</span>
+                  </div>
+                  <div class="p-3 text-center">
+                    <div class="text-[10px] font-bold text-slate-800 mb-1">
+                      Verify Ticket
+                    </div>
+                    <div
+                      class="text-sm font-black tracking-[0.2em] text-slate-800"
+                    >
+                      || |||| ||
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div
+              class="bg-white rounded-[16px] border border-slate-200 p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 class="text-[13px] font-medium text-slate-500 mb-2">
+                Total Rooms
+              </h3>
+              <div
+                class="text-3xl font-bold text-slate-800"
+                id="stat_total_rooms"
+              >
+                24
+              </div>
+            </div>
+            <div
+              class="bg-white rounded-[16px] border border-slate-200 p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 class="text-[13px] font-medium text-slate-500 mb-2">
+                Active Stays
+              </h3>
+              <div class="text-3xl font-bold text-slate-800" id="stat_active">
+                8
+              </div>
+            </div>
+            <div
+              class="bg-white rounded-[16px] border border-slate-200 p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 class="text-[13px] font-medium text-slate-500 mb-2">
+                Pending
+              </h3>
+              <div class="text-3xl font-bold text-slate-800" id="stat_pending">
+                3
+              </div>
+            </div>
+            <div
+              class="bg-white rounded-[16px] border border-slate-200 p-6 shadow-sm hover:shadow-md transition"
+            >
+              <h3 class="text-[13px] font-medium text-slate-500 mb-2">
+                Revenue
+              </h3>
+              <div class="text-3xl font-bold text-slate-800" id="stat_revenue">
+                $1,250.00
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div
+              class="lg:col-span-2 bg-white rounded-[16px] border border-slate-200 shadow-sm p-6"
+            >
+              <h3 class="text-sm font-bold text-slate-800 mb-6">
+                Volume (Last 7 Days)
+              </h3>
+              <div class="h-64 w-full">
+                <canvas id="realBookingChart"></canvas>
+              </div>
+            </div>
+            <div
+              class="bg-white rounded-[16px] border border-slate-200 shadow-sm p-6"
+            >
+              <h3 class="text-sm font-bold text-slate-800 mb-6">
+                Recent Activity
+              </h3>
+              <div
+                class="relative pl-4 border-l border-slate-200 ml-2 space-y-6"
+                id="recentActivityBox"
+              >
+                <div class="relative">
+                  <div
+                    class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full"
+                    style="background: #10b981; box-shadow: 0 0 0 4px white"
+                  ></div>
+                  <div class="text-sm font-medium text-slate-700">
+                    មានការកក់ពី Sok Dara
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-1">
+                    Today, 08:30 AM
+                  </div>
+                </div>
+                <div class="relative">
+                  <div
+                    class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full"
+                    style="background: #3b82f6; box-shadow: 0 0 0 4px white"
+                  ></div>
+                  <div class="text-sm font-medium text-slate-700">
+                    មានការកក់ពី Chan Chhay
+                  </div>
+                  <div class="text-[11px] text-slate-400 mt-1">
+                    Yesterday, 02:15 PM
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="booking" class="tab-content">
+          <div
+            class="bg-white rounded-[24px] shadow-sm border border-slate-100 p-8 lg:p-10"
+          >
+            <div
+              class="flex items-center gap-4 mb-8 border-b border-slate-100 pb-6"
+            >
+              <div
+                class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner"
+              >
+                📝
+              </div>
+              <div>
+                <h2 class="text-2xl font-black text-slate-800">
+                  បង្កើតការកក់ថ្មី
+                </h2>
+                <p class="text-sm text-slate-500 font-medium mt-1">
+                  បំពេញព័ត៌មានភ្ញៀវ និងជ្រើសរើសជម្រើសទូទាត់
+                </p>
+              </div>
+            </div>
+
+            <form
+              onsubmit="handleAdminBook(event)"
+              id="bookingForm"
+              class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
+            >
+              <div class="md:col-span-2">
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ជ្រើសរើសបន្ទប់ទំនេរ (Room Unit)</label
+                >
+                <div class="relative">
+                  <select
+                    name="room_id"
+                    id="roomSelect"
+                    class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl pl-4 pr-10 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-slate-700 appearance-none cursor-pointer"
+                    required
+                    onchange="
+                      fetchBookedSlots();
+                      validateLiveDates();
+                    "
+                  >
+                    <option value="" disabled selected>
+                      -- ចុចជ្រើសរើសបន្ទប់ --
+                    </option>
+                    <option value="1" data-price="25">
+                      🚪 បន្ទប់ A01 &nbsp;•&nbsp; VIP &nbsp;•&nbsp;
+                      ($25.00/ថ្ងៃ)
+                    </option>
+                    <option value="2" data-price="15">
+                      🚪 បន្ទប់ B02 &nbsp;•&nbsp; Standard &nbsp;•&nbsp;
+                      ($15.00/ថ្ងៃ)
+                    </option>
+                  </select>
+                  <div
+                    class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  id="liveStatusBox"
+                  class="mt-3 hidden bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm"
+                >
+                  <h4
+                    class="text-xs font-bold text-amber-800 mb-2 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                    ម៉ោងដែលមានគេកក់រួចហើយ:
+                  </h4>
+                  <div id="slotsContainer" class="flex flex-wrap gap-2"></div>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ឈ្មោះភ្ញៀវ (Guest Name)</label
+                >
+                <input
+                  type="text"
+                  name="tenant_name"
+                  id="b_tenant_name"
+                  placeholder="ឧ. Sok Dara"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-slate-700"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >លេខទូរស័ព្ទ (Phone)</label
+                >
+                <input
+                  type="text"
+                  name="tenant_phone"
+                  id="b_tenant_phone"
+                  placeholder="012 345 678"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-slate-700"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ថ្ងៃចូល (Check-In)</label
+                >
+                <input
+                  type="datetime-local"
+                  name="check_in_time"
+                  id="checkInInput"
+                  onchange="validateLiveDates()"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700"
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ថ្ងៃចេញ (Check-Out)</label
+                >
+                <input
+                  type="datetime-local"
+                  name="check_out_time"
+                  id="checkOutInput"
+                  onchange="validateLiveDates()"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700"
+                  required
+                />
+              </div>
+
+              <div
+                class="md:col-span-2 bg-[#F8FAFC] p-6 rounded-2xl border border-slate-200 mt-2"
+              >
+                <h3
+                  class="text-sm font-black text-slate-800 mb-5 flex items-center gap-2"
+                >
+                  <svg
+                    class="w-5 h-5 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                    ></path>
+                  </svg>
+                  ផ្នែកទូទាត់ប្រាក់ (Payment Details)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                      >វិធីសាស្ត្រ (Method)</label
+                    >
+                    <select
+                      name="payment_method"
+                      id="paymentMethod"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-bold text-slate-700 shadow-sm"
+                      required
+                    >
+                      <option value="cash">💵 ទូទាត់សាច់ប្រាក់ (Cash)</option>
+                      <option value="online">💳 U-Pay / Online</option>
+                      <option value="card">💳 ឆូតកាត (Card Swipe)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                      >ស្ថានភាព (Status)</label
+                    >
+                    <select
+                      name="payment_status"
+                      id="paymentStatusSelect"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-bold text-slate-700 shadow-sm"
+                      required
+                    >
+                      <option value="unpaid" class="text-red-500 font-bold">
+                        ❌ មិនទាន់បង់ (បន្តទៅម៉ាស៊ីន POS)
+                      </option>
+                      <option value="paid" class="text-emerald-600 font-bold">
+                        ✅ បង់រួចរាល់ (Paid)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="md:col-span-2">
+                    <div
+                      id="paymentNote"
+                      class="bg-white p-5 rounded-xl border-l-4 border-blue-500 text-sm font-medium text-slate-600 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    >
+                      <div class="flex items-center gap-3">
+                        <span class="text-2xl">💡</span>
+                        <span
+                          >សូមជ្រើសរើសបន្ទប់
+                          និងម៉ោងចេញចូលដើម្បីប្រព័ន្ធគណនាតម្លៃ។</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ស្ថានភាពកក់ (Booking Status)</label
+                >
+                <select
+                  name="status"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 font-bold text-slate-700"
+                  required
+                >
+                  <option value="booked">📅 កក់ទុកមុន (Advance Booking)</option>
+                  <option value="checked_in">
+                    📥 ចូលស្នាក់នៅភ្លាម (Instant Check-In)
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="liveErrorBanner"
+                class="live-error-banner md:col-span-2 bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-center shadow-sm font-bold flex items-center justify-center gap-2"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                ម៉ោងនេះមានគេកក់រួចហើយ! សូមប្តូរម៉ោងថ្មីដើម្បីអាចបន្តបាន។
+              </div>
+
+              <div class="md:col-span-2 mt-4">
+                <button
+                  type="submit"
+                  id="submitBookBtn"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-[0_10px_20px_-10px_rgba(37,99,235,0.5)] transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2"
+                >
+                  បន្តទៅកាន់ម៉ាស៊ីន POS (Pay Now)
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="floorplan" class="tab-content">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div
+              class="bg-white rounded-[16px] shadow-sm border border-slate-100 p-6 flex flex-col max-h-[300px]"
+            >
+              <h3
+                class="text-sm font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-3"
+              >
+                គ្រប់គ្រងប្រភេទបន្ទប់
+              </h3>
+              <form onsubmit="handleAddType(event)" class="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  id="new_type_name"
+                  placeholder="បញ្ចូលប្រភេទថ្មី..."
+                  class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 outline-none focus:border-blue-500 text-sm"
+                  required
+                />
+                <button
+                  type="submit"
+                  class="bg-[#0B1120] hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl shadow transition text-xs"
+                >
+                  បញ្ចូល
+                </button>
+              </form>
+              <div class="flex-1 overflow-y-auto pr-2">
+                <table class="w-full text-left text-sm">
+                  <tbody class="divide-y divide-slate-100" id="roomTypesList">
+                    <tr class="hover:bg-slate-50 group">
+                      <td class="py-2 font-medium text-slate-700">VIP</td>
+                      <td
+                        class="py-2 text-right opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <button
+                          onclick="openEditTypeModal('1', 'VIP')"
+                          class="text-blue-500 hover:text-blue-700 px-2"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onclick="deleteMock(this)"
+                          class="text-red-500 hover:text-red-700"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-slate-50 group">
+                      <td class="py-2 font-medium text-slate-700">Standard</td>
+                      <td
+                        class="py-2 text-right opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <button
+                          onclick="openEditTypeModal('2', 'Standard')"
+                          class="text-blue-500 hover:text-blue-700 px-2"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onclick="deleteMock(this)"
+                          class="text-red-500 hover:text-red-700"
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div
+              class="bg-white rounded-[16px] shadow-sm border border-slate-100 p-6"
+            >
+              <h3
+                class="text-sm font-bold text-slate-800 mb-4 border-l-4 border-emerald-500 pl-3"
+              >
+                បញ្ចូលបន្ទប់ថ្មី
+              </h3>
+              <form onsubmit="handleAddRoom(event)" class="flex flex-col gap-4">
+                <div class="flex gap-3">
+                  <input
+                    type="text"
+                    id="new_room_no"
+                    placeholder="លេខបន្ទប់ (ឧ. A01)"
+                    class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-sm"
+                    required
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    id="new_room_price"
+                    placeholder="តម្លៃ ($)"
+                    class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-sm"
+                    required
+                  />
+                </div>
+                <div class="flex gap-3">
+                  <select
+                    id="new_room_type"
+                    class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-emerald-500 text-sm"
+                    required
+                  >
+                    <option value="" disabled selected>
+                      -- ជ្រើសរើសប្រភេទ --
+                    </option>
+                    <option value="1">VIP</option>
+                    <option value="2">Standard</option>
+                  </select>
+                  <button
+                    type="submit"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition text-sm"
+                  >
+                    រក្សាទុក
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-[16px] shadow-sm border border-slate-100 p-8"
+          >
+            <h2
+              class="text-xl font-bold text-slate-800 mb-6 border-l-4 border-slate-500 pl-3"
+            >
+              Interactive Floor Plan
+            </h2>
+            <div
+              id="floorplanGrid"
+              class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"
+            >
+              <div
+                onclick="gotoBooking('1')"
+                class="border-2 rounded-2xl p-6 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md"
+              >
+                <div
+                  class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <button
+                    onclick="
+                      event.stopPropagation();
+                      openEditRoomModal('1', 'A01', '1', '25');
+                    "
+                    class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onclick="
+                      event.stopPropagation();
+                      deleteMock(this.parentElement.parentElement);
+                    "
+                    class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs"
+                  >
+                    🗑️
+                  </button>
+                </div>
+                <span class="text-3xl font-black tracking-tight">A01</span>
+                <span
+                  class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg"
+                  >VIP <span class="text-slate-400">($25.00)</span></span
+                >
+              </div>
+
+              <div
+                onclick="
+                  openRoomDetails(
+                    'B02',
+                    'Sok Dara',
+                    '012345678',
+                    'May 15, 14:00',
+                    'May 16, 12:00',
+                  )
+                "
+                class="border-2 rounded-2xl p-6 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md"
+              >
+                <div
+                  class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <button
+                    onclick="
+                      event.stopPropagation();
+                      openEditRoomModal('2', 'B02', '2', '15');
+                    "
+                    class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onclick="
+                      event.stopPropagation();
+                      deleteMock(this.parentElement.parentElement);
+                    "
+                    class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs"
+                  >
+                    🗑️
+                  </button>
+                </div>
+                <span class="absolute top-3 right-3 flex h-3 w-3"
+                  ><span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                  ></span
+                  ><span
+                    class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
+                  ></span
+                ></span>
+                <span class="text-3xl font-black tracking-tight">B02</span>
+                <span
+                  class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg"
+                  >Standard <span class="text-slate-400">($15.00)</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="guestlist" class="tab-content">
+          <div
+            class="bg-white rounded-[16px] shadow-sm border border-slate-100 overflow-hidden"
+          >
+            <div
+              class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4"
+            >
+              <h2 class="text-lg font-bold text-slate-800">Guest Database</h2>
+              <div class="flex gap-2">
+                <button
+                  onclick="openScanner()"
+                  class="bg-[#0B1120] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-slate-800 transition shadow-sm"
+                >
+                  📷 Scan
+                </button>
+                <input
+                  type="text"
+                  id="searchInput"
+                  onkeyup="searchTable()"
+                  placeholder="Search Code, Name..."
+                  class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 w-64 outline-none text-sm"
+                />
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full clean-table text-left" id="guestTable">
+                <thead>
+                  <tr
+                    class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider"
+                  >
+                    <th class="px-6 pt-5">Ref & Room</th>
+                    <th class="px-6 pt-5">Guest</th>
+                    <th class="px-6 pt-5">Schedule</th>
+                    <th class="px-6 pt-5">Payment</th>
+                    <th class="px-6 pt-5">Status</th>
+                    <th class="px-6 pt-5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="text-sm">
+                  <tr>
+                    <td class="px-6">
+                      <div class="font-bold text-slate-800 text-base">
+                        Room B02
+                      </div>
+                      <div
+                        class="text-[11px] text-blue-500 mt-1 font-mono font-bold"
+                      >
+                        BK-102-B02
+                      </div>
+                    </td>
+                    <td class="px-6">
+                      <div class="font-bold">Sok Dara</div>
+                      <div class="text-slate-500 text-xs mt-1">012345678</div>
+                    </td>
+                    <td class="px-6 text-xs text-slate-500">
+                      <div class="text-emerald-600">IN: 05/15/26 02:00 PM</div>
+                      <div class="text-amber-600">OUT: 05/16/26 12:00 PM</div>
+                    </td>
+                    <td class="px-6">
+                      <div class="mt-2">
+                        <span
+                          class="text-emerald-600 text-[12px] font-bold flex items-center gap-1"
+                        >
+                          <svg
+                            class="w-3 h-3"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                          Paid
+                        </span>
+                      </div>
+                    </td>
+                    <td class="px-6">
+                      <div>
+                        <span
+                          class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase"
+                          >Active</span
+                        >
+                      </div>
+                    </td>
+                    <td class="px-6 text-right space-x-1">
+                      <button
+                        onclick="
+                          openBoardingPass(
+                            'Sok Dara',
+                            '012345678',
+                            'B02',
+                            'Standard',
+                            'May 15, 14:00',
+                            'May 16, 12:00',
+                            '102',
+                          )
+                        "
+                        class="p-1.5 text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 rounded"
+                        title="Ticket"
+                      >
+                        🎫
+                      </button>
+                      <button
+                        onclick="alert('Mock Action: Checkout')"
+                        class="p-1.5 inline-block text-amber-500 bg-amber-50 hover:bg-amber-100 rounded"
+                        title="Check Out"
+                      >
+                        📤
+                      </button>
+                      <button
+                        onclick="
+                          openEditModal('102', 'Sok Dara', '012345678', '2')
+                        "
+                        class="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded"
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onclick="deleteMock(this.parentElement.parentElement)"
+                        class="p-1.5 inline-block text-red-500 bg-red-50 hover:bg-red-100 rounded"
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="px-6">
+                      <div class="font-bold text-slate-800 text-base">
+                        Room A01
+                      </div>
+                      <div
+                        class="text-[11px] text-blue-500 mt-1 font-mono font-bold"
+                      >
+                        BK-103-A01
+                      </div>
+                    </td>
+                    <td class="px-6">
+                      <div class="font-bold">Chan Chhay</div>
+                      <div class="text-slate-500 text-xs mt-1">098765432</div>
+                    </td>
+                    <td class="px-6 text-xs text-slate-500">
+                      <div class="text-emerald-600">IN: 05/20/26 09:00 AM</div>
+                      <div class="text-amber-600">OUT: 05/22/26 12:00 PM</div>
+                    </td>
+                    <td class="px-6">
+                      <div class="mt-2">
+                        <span
+                          class="text-red-500 text-[12px] font-bold flex items-center gap-1"
+                        >
+                          <svg
+                            class="w-3 h-3"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clip-rule="evenodd"
+                            ></path>
+                          </svg>
+                          Unpaid
+                        </span>
+                        <a
+                          href="#"
+                          onclick="alert('Mock Navigation: To Payment Page')"
+                          class="text-[10px] text-blue-600 font-bold hover:text-blue-800 hover:underline inline-block mt-1 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded transition"
+                          >🔄 Pay Now</a
+                        >
+                      </div>
+                    </td>
+                    <td class="px-6">
+                      <div>
+                        <span
+                          class="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase"
+                          >Booked</span
+                        >
+                      </div>
+                    </td>
+                    <td class="px-6 text-right space-x-1">
+                      <button
+                        onclick="
+                          openBoardingPass(
+                            'Chan Chhay',
+                            '098765432',
+                            'A01',
+                            'VIP',
+                            'May 20, 09:00',
+                            'May 22, 12:00',
+                            '103',
+                          )
+                        "
+                        class="p-1.5 text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 rounded"
+                        title="Ticket"
+                      >
+                        🎫
+                      </button>
+                      <button
+                        onclick="alert('Mock Action: Checkin')"
+                        class="p-1.5 inline-block text-emerald-500 bg-emerald-50 hover:bg-emerald-100 rounded"
+                        title="Check In"
+                      >
+                        📥
+                      </button>
+                      <button
+                        onclick="
+                          openEditModal('103', 'Chan Chhay', '098765432', '1')
+                        "
+                        class="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded"
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onclick="deleteMock(this.parentElement.parentElement)"
+                        class="p-1.5 inline-block text-red-500 bg-red-50 hover:bg-red-100 rounded"
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div
+      id="editTypeModal"
+      class="fixed inset-0 z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModals()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl"
+      >
+        <h3 class="text-lg font-bold text-slate-800 mb-4">
+          កែប្រែប្រភេទបន្ទប់
+        </h3>
+        <form
+          onsubmit="handleGenericSubmit(event, 'កែប្រែប្រភេទបន្ទប់ជោគជ័យ!')"
+        >
+          <input type="hidden" id="edit_type_id" />
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-500 mb-2"
+              >ឈ្មោះប្រភេទ</label
+            >
+            <input
+              type="text"
+              id="edit_type_name"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick="closeEditModals()"
+              class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl transition"
+            >
+              បោះបង់
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-[#0B1120] text-white font-bold py-3 rounded-xl shadow transition"
+            >
+              រក្សាទុក
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="editRoomModal"
+      class="fixed inset-0 z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModals()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl"
+      >
+        <h3 class="text-lg font-bold text-slate-800 mb-4">
+          កែប្រែព័ត៌មានបន្ទប់
+        </h3>
+        <form onsubmit="handleGenericSubmit(event, 'កែប្រែបន្ទប់ជោគជ័យ!')">
+          <input type="hidden" id="edit_room_id" />
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-500 mb-2"
+              >លេខបន្ទប់</label
+            >
+            <input
+              type="text"
+              id="edit_room_number"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-500 mb-2"
+              >ប្រភេទបន្ទប់</label
+            >
+            <select
+              id="edit_type_id_select"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            >
+              <option value="1">VIP</option>
+              <option value="2">Standard</option>
+            </select>
+          </div>
+          <div class="mb-6">
+            <label class="block text-xs font-bold text-slate-500 mb-2"
+              >តម្លៃប្រចាំថ្ងៃ ($)</label
+            >
+            <input
+              type="number"
+              step="0.01"
+              id="edit_price"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick="closeEditModals()"
+              class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl transition"
+            >
+              បោះបង់
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-[#0B1120] text-white font-bold py-3 rounded-xl shadow transition"
+            >
+              រក្សាទុក
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="supportModal"
+      class="fixed inset-0 z-[80] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeSupportInfo()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform"
+        id="supportBox"
+      >
+        <div
+          class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black"
+        >
+          📞
+        </div>
+        <h3 class="text-xl font-bold text-center text-slate-800 mb-6">
+          Contact Support
+        </h3>
+        <div
+          class="space-y-3 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100"
+        >
+          <div class="flex flex-col border-b pb-2">
+            <span class="text-xs text-slate-400">Email:</span
+            ><span class="text-slate-800 font-bold">support@urental.com</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-slate-400">Hotline:</span
+            ><span class="text-blue-600 font-bold text-lg"
+              >+855 12 345 678</span
+            >
+          </div>
+        </div>
+        <button
+          onclick="closeSupportInfo()"
+          class="mt-6 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition"
+        >
+          Got it!
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="roomDetailsModal"
+      class="fixed inset-0 z-[80] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeRoomDetails()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform"
+        id="rdBox"
+      >
+        <div
+          class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-black"
+          id="rd_room"
+        ></div>
+        <h3
+          class="text-xl font-bold text-center text-slate-800 mb-6"
+          id="rd_name"
+        ></h3>
+        <div
+          class="space-y-3 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-xl"
+        >
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span>Phone:</span
+            ><span id="rd_phone" class="text-slate-800 font-bold"></span>
+          </div>
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span>Check-In:</span
+            ><span id="rd_in" class="text-emerald-600 font-bold"></span>
+          </div>
+          <div class="flex justify-between pb-2">
+            <span>Check-Out:</span
+            ><span id="rd_out" class="text-amber-600 font-bold"></span>
+          </div>
+        </div>
+        <button
+          onclick="closeRoomDetails()"
+          class="mt-6 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="editModal"
+      class="fixed inset-0 z-[60] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModal()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-md shadow-2xl scale-95 transition-transform"
+        id="editBox"
+      >
+        <h3
+          class="text-lg font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3"
+        >
+          Edit Booking Info
+        </h3>
+        <form onsubmit="handleGenericSubmit(event, 'កែប្រែព័ត៌មានកក់ជោគជ័យ!')">
+          <input type="hidden" id="edit_id" />
+          <div class="space-y-4">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >Guest Name</label
+              ><input
+                type="text"
+                id="edit_name"
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >Phone Number</label
+              ><input
+                type="text"
+                id="edit_phone"
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >Change Room</label
+              >
+              <select
+                id="edit_room_id"
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:border-blue-500"
+                required
+              >
+                <option value="1">Room A01</option>
+                <option value="2">Room B02</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button
+              type="button"
+              onclick="closeEditModal()"
+              class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition"
+            >
+              Update Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="scannerModal"
+      class="fixed inset-0 z-[60] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/80 backdrop-blur-sm absolute inset-0"
+        onclick="closeScanner()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-6 relative z-10 w-[90%] max-w-lg shadow-2xl scale-95 transition-transform"
+        id="scannerBox"
+      >
+        <h3
+          class="text-sm font-bold text-slate-800 mb-4 flex justify-between items-center border-b pb-3"
+        >
+          <span class="flex items-center gap-2">📷 Smart Scanner</span>
+          <button
+            onclick="closeScanner()"
+            class="bg-slate-100 rounded-full w-8 h-8 font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 transition"
+          >
+            X
+          </button>
+        </h3>
+        <p class="text-[11px] text-slate-500 mb-4 text-center font-medium">
+          Use Camera or choose
+          <strong class="text-blue-600">"Scan an Image File"</strong>
+          below.<br />Format must match: BK-ID-ROOM
+        </p>
+        <div
+          id="reader"
+          class="rounded-xl overflow-hidden border-2 border-slate-200 shadow-inner bg-slate-50 pb-2"
+        ></div>
+      </div>
+    </div>
+
+    <div
+      id="boardingPassModal"
+      class="fixed inset-0 z-[70] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeBoardingPass()"
+      ></div>
+      <div
+        class="relative z-10 scale-95 transition-transform duration-300 transform"
+        id="bpBox"
+      >
+        <div
+          id="printableBoardingPass"
+          class="ticket-modal bg-white rounded-[16px] overflow-hidden flex w-[850px] shadow-2xl border border-slate-200 relative"
+        >
+          <div
+            class="flex-[2.8] relative bg-white border-r-2 border-dashed border-slate-300 z-10"
+          >
+            <div
+              class="bg-[#E11D48] text-white px-8 py-4 flex justify-between items-center"
+            >
+              <h1
+                class="text-xl tracking-widest font-bold flex items-center gap-2"
+              >
+                BOOKING TICKET
+              </h1>
+              <span
+                class="text-[11px] font-bold tracking-widest bg-white/20 px-3 py-1 rounded-full"
+                >U-RENTAL</span
+              >
+            </div>
+            <div class="p-8 relative">
+              <div class="flex justify-between mb-6 relative z-10">
+                <div>
+                  <div
+                    class="text-[10px] text-slate-400 font-bold tracking-widest"
+                  >
+                    NAME OF GUEST
+                  </div>
+                  <div
+                    id="bp_name"
+                    class="text-lg font-black text-slate-900 uppercase"
+                  >
+                    ---
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div
+                    class="text-[10px] text-slate-400 font-bold tracking-widest"
+                  >
+                    PHONE NUMBER
+                  </div>
+                  <div id="bp_phone" class="text-base font-bold text-slate-900">
+                    ---
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-between relative z-10">
+                <div>
+                  <div
+                    class="text-[10px] text-slate-400 font-bold tracking-widest"
+                  >
+                    ROOM NO.
+                  </div>
+                  <div
+                    id="bp_room"
+                    class="text-[40px] font-black text-[#E11D48] leading-none mt-1"
+                  >
+                    ---
+                  </div>
+                  <div
+                    id="bp_type"
+                    class="text-[11px] font-bold text-slate-500 mt-2 bg-slate-100 inline-block px-2 py-1 rounded"
+                  >
+                    ---
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div
+                    class="text-[10px] text-slate-400 font-bold tracking-widest"
+                  >
+                    CHECK-IN
+                  </div>
+                  <div id="bp_in" class="text-[15px] font-bold text-slate-900">
+                    ---
+                  </div>
+                  <div
+                    class="text-[10px] text-slate-400 font-bold tracking-widest mt-3"
+                  >
+                    CHECK-OUT
+                  </div>
+                  <div id="bp_out" class="text-[15px] font-bold text-slate-900">
+                    ---
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center relative z-10"
+              >
+                <svg id="bp_barcode"></svg>
+                <div class="text-[10px] text-slate-400 font-bold">
+                  Powered by U-Rental
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-[1.2] relative bg-slate-50 z-10">
+            <div class="bg-[#BE123C] text-white px-6 py-4 text-center">
+              <h1 class="text-base font-bold tracking-widest">TICKET</h1>
+            </div>
+            <div class="p-6 text-center">
+              <div class="text-[10px] text-slate-400 font-bold tracking-widest">
+                BOARDING ROOM
+              </div>
+              <div
+                id="bp_room_small"
+                class="text-[32px] font-black text-slate-900 mt-1"
+              >
+                ---
+              </div>
+              <div
+                class="bg-white inline-block p-2 border-2 border-slate-200 rounded-xl mt-6 shadow-sm"
+              >
+                <img id="bp_qr" src="" alt="QR" width="120" />
+              </div>
+              <div
+                class="text-[9px] text-slate-400 font-bold mt-2 tracking-widest text-emerald-600"
+              >
+                SHOW AT COUNTER
+              </div>
+            </div>
+          </div>
+          <div
+            class="absolute top-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] border border-slate-200 rounded-full transform -translate-x-1/2 z-20 shadow-inner"
+          ></div>
+          <div
+            class="absolute bottom-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] border border-slate-200 rounded-full transform -translate-x-1/2 z-20 shadow-inner"
+          ></div>
+        </div>
+
+        <div class="flex justify-center gap-3 mt-6 relative z-10 no-print">
+          <button
+            onclick="window.print()"
+            class="bg-white text-slate-800 text-sm font-bold px-8 py-3 rounded-xl shadow-lg flex items-center gap-2 hover:bg-slate-50 transition transform hover:-translate-y-1"
+          >
+            🖨️ Print Pass
+          </button>
+          <button
+            onclick="closeBoardingPass()"
+            class="bg-slate-800 text-white text-sm font-bold px-8 py-3 rounded-xl shadow-lg flex items-center gap-2 hover:bg-slate-900 transition transform hover:-translate-y-1"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==========================================
+      // ទី១៖ គ្រប់គ្រងការគូរក្រាហ្វ (Chart Management)
+      // ==========================================
+      let bookingChartInstance = null;
+
+      // ទិន្នន័យគំរូសម្រាប់ក្រាហ្វ (ជំនួសឱ្យ PHP Array)
+      const mockChartLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const mockChartData = [1, 3, 2, 5, 4, 8, 6];
+
+      function initChart() {
+        const chartCanvas = document.getElementById("realBookingChart");
+        if (!chartCanvas || chartCanvas.offsetParent === null) return;
+
+        const ctx = chartCanvas.getContext("2d");
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+        gradient.addColorStop(1, "rgba(59, 130, 246, 0.0)");
+
+        if (bookingChartInstance) {
+          bookingChartInstance.destroy();
+        }
+
+        bookingChartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: mockChartLabels,
+            datasets: [
+              {
+                label: "Bookings",
+                data: mockChartData,
+                borderColor: "#3B82F6",
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#3B82F6",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                suggestedMax: 5,
+                border: { display: false },
+                grid: { color: "#f1f5f9" },
+              },
+              x: { border: { display: false }, grid: { display: false } },
+            },
+          },
+        });
+      }
+
+      // ==========================================
+      // ទី២៖ Tab Management
+      // ==========================================
+      document.addEventListener("DOMContentLoaded", () => {
+        let activeTab =
+          sessionStorage.getItem("urental_admin_tab") || "overview";
+        switchTab(activeTab);
+      });
+
+      function switchTab(tabId) {
+        sessionStorage.setItem("urental_admin_tab", tabId);
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+
+        const btns = ["overview", "booking", "floorplan", "guestlist"];
+        const titles = {
+          overview: "Platform Overview",
+          booking: "Create Booking",
+          floorplan: "Live Floor Plan",
+          guestlist: "Guest Database",
+        };
+
+        btns.forEach((id) => {
+          let btn = document.getElementById("nav-" + id);
+          if (id === tabId) {
+            btn.classList.add("bg-white/10", "text-white");
+            document.getElementById("headerTitle").innerText = titles[id];
+          } else {
+            btn.classList.remove("bg-white/10", "text-white");
+          }
+        });
+
+        if (tabId === "overview") {
+          setTimeout(() => {
+            initChart();
+          }, 150);
+        }
+      }
+
+      // ==========================================
+      // ទី៣៖ SPA Handlers & Toast Alerts (ជំនួស PHP)
+      // ==========================================
+      function showToast(msg, isError = false) {
+        let t = document.getElementById("toastAlert");
+        let text = document.getElementById("toastMsg");
+
+        text.innerText = msg;
+        if (isError) {
+          t.classList.remove("bg-slate-800");
+          t.classList.add("bg-red-600");
+        } else {
+          t.classList.remove("bg-red-600");
+          t.classList.add("bg-slate-800");
+        }
+
+        t.classList.remove("translate-x-full", "opacity-0");
+        setTimeout(() => {
+          t.classList.add("translate-x-full", "opacity-0");
+        }, 3000);
+      }
+
+      function handleAdminBook(e) {
+        e.preventDefault();
+        let name = document.getElementById("b_tenant_name").value;
+        let payment = document.getElementById("paymentStatusSelect").value;
+        console.log("Mock API Book Form Submitted:", name, payment);
+
+        if (payment === "unpaid") {
+          // Mock Redirect to POS
+          alert("Mock: Redirecting to POS (paymentadmin.html) for " + name);
+        } else {
+          showToast("✅ បង្កើតការកក់ជោគជ័យ!");
+          e.target.reset();
+          validateLiveDates();
+        }
+      }
+
+      function handleAddType(e) {
+        e.preventDefault();
+        showToast("✅ បន្ថែមប្រភេទបន្ទប់ថ្មីជោគជ័យ!");
+        e.target.reset();
+      }
+
+      function handleAddRoom(e) {
+        e.preventDefault();
+        showToast("✅ បន្ថែមបន្ទប់ថ្មីជោគជ័យ!");
+        e.target.reset();
+      }
+
+      function handleGenericSubmit(e, successMsg) {
+        e.preventDefault();
+        closeEditModals();
+        closeEditModal();
+        showToast("✅ " + successMsg);
+      }
+
+      function deleteMock(element) {
+        if (confirm("តើអ្នកពិតជាចង់លុបទិន្នន័យនេះមែនទេ?")) {
+          if (element) element.remove();
+          showToast("🗑️ លុបទិន្នន័យជោគជ័យ!");
+        }
+      }
+
+      // ==========================================
+      // ទី៤៖ មុខងារទូទៅផ្សេងៗ (រក្សាទុកនៅដដែល)
+      // ==========================================
+      function triggerConfirm(actionType, linkUrl) {
+        let title = document.getElementById("confirmTitle");
+        let text = document.getElementById("confirmText");
+        let icon = document.getElementById("confirmIcon");
+        let btn = document.getElementById("confirmBtn");
+
+        if (actionType === "delete") {
+          icon.innerText = "🗑️";
+          icon.className =
+            "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-red-100 text-red-500";
+          title.innerText = "Delete Record";
+          text.innerText = "This action cannot be undone. Proceed?";
+          btn.className =
+            "px-5 py-2.5 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-red-600 hover:bg-red-700";
+        } else if (actionType === "logout") {
+          icon.innerText = "🚪";
+          icon.className =
+            "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-slate-100 text-slate-600";
+          title.innerText = "Secure Logout";
+          text.innerText = "Are you sure you want to end your session?";
+          btn.className =
+            "px-5 py-2.5 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-slate-800 hover:bg-slate-900";
+        }
+
+        // Since it's SPA, modify the link behavior
+        btn.onclick = function () {
+          if (actionType === "logout") {
+            window.location.href = linkUrl;
+          } else {
+            alert("Mock Action Excecuted");
+            closeConfirm();
+          }
+        };
+
+        document
+          .getElementById("customConfirmModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("confirmBox").classList.remove("scale-95");
+        }, 10);
+      }
+
+      function closeConfirm() {
+        document.getElementById("confirmBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("customConfirmModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      function openEditTypeModal(id, name) {
+        document.getElementById("edit_type_id").value = id;
+        document.getElementById("edit_type_name").value = name;
+        document
+          .getElementById("editTypeModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+      }
+
+      function openEditRoomModal(id, number, typeId, price) {
+        document.getElementById("edit_room_id").value = id;
+        document.getElementById("edit_room_number").value = number;
+        document.getElementById("edit_type_id_select").value = typeId;
+        document.getElementById("edit_price").value = price;
+        document
+          .getElementById("editRoomModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+      }
+
+      function closeEditModals() {
+        document
+          .getElementById("editTypeModal")
+          .classList.add("opacity-0", "pointer-events-none");
+        document
+          .getElementById("editRoomModal")
+          .classList.add("opacity-0", "pointer-events-none");
+      }
+
+      function openRoomDetails(room, name, phone, inDate, outDate) {
+        document.getElementById("rd_room").innerText = room;
+        document.getElementById("rd_name").innerText = name;
+        document.getElementById("rd_phone").innerText = phone;
+        document.getElementById("rd_in").innerText = inDate;
+        document.getElementById("rd_out").innerText = outDate;
+        document
+          .getElementById("roomDetailsModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("rdBox").classList.remove("scale-95");
+        }, 10);
+      }
+      function closeRoomDetails() {
+        document.getElementById("rdBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("roomDetailsModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      function showSupportInfo() {
+        document
+          .getElementById("supportModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("supportBox").classList.remove("scale-95");
+        }, 10);
+      }
+      function closeSupportInfo() {
+        document.getElementById("supportBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("supportModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      function gotoBooking(roomId) {
+        switchTab("booking");
+        document.getElementById("roomSelect").value = roomId;
+        fetchBookedSlots();
+      }
+
+      document
+        .getElementById("paymentStatusSelect")
+        .addEventListener("change", function () {
+          let btn = document.getElementById("submitBookBtn");
+          if (this.value === "unpaid") {
+            btn.innerHTML =
+              'បន្តទៅកាន់ម៉ាស៊ីន POS (Pay Now) <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
+            btn.className =
+              "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-[0_10px_20px_-10px_rgba(37,99,235,0.5)] transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2";
+          } else {
+            btn.innerHTML = "រក្សាទុកការកក់ (Save Booking) ✅";
+            btn.className =
+              "w-full bg-[#0B1120] hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2";
+          }
+        });
+
+      let activeBookings = [];
+      function fetchBookedSlots() {
+        let roomId = document.getElementById("roomSelect").value;
+        let box = document.getElementById("liveStatusBox");
+        let container = document.getElementById("slotsContainer");
+        if (!roomId) return;
+
+        // Mocking API call to check_availability.php
+        box.classList.add("hidden");
+        container.innerHTML = "";
+        activeBookings = []; // Empty for mock
+        validateLiveDates();
+      }
+
+      function validateLiveDates() {
+        let checkInInput = document.getElementById("checkInInput");
+        let checkOutInput = document.getElementById("checkOutInput");
+        let checkIn = checkInInput.value;
+        let checkOut = checkOutInput.value;
+        let err = document.getElementById("liveErrorBanner");
+        let btn = document.getElementById("submitBookBtn");
+
+        if (checkIn) {
+          checkOutInput.min = checkIn;
+          let inDate = new Date(checkIn);
+          let outDate = new Date(checkOut);
+
+          if (!checkOut || outDate <= inDate) {
+            let nextDay = new Date(inDate.getTime() + 24 * 60 * 60 * 1000);
+            let tzoffset = new Date().getTimezoneOffset() * 60000;
+            checkOutInput.value = new Date(nextDay - tzoffset)
+              .toISOString()
+              .slice(0, 16);
+            checkOut = checkOutInput.value;
+          }
+        }
+
+        if (!checkIn || !checkOut || activeBookings.length === 0) {
+          err.style.display = "none";
+          btn.disabled = false;
+          btn.classList.remove("opacity-50", "cursor-not-allowed", "scale-100");
+        }
+
+        let roomSelect = document.getElementById("roomSelect");
+        let note = document.getElementById("paymentNote");
+        if (roomSelect.value && checkIn && checkOut && !btn.disabled) {
+          let selectedOption = roomSelect.options[roomSelect.selectedIndex];
+          let pricePerDay = parseFloat(
+            selectedOption.getAttribute("data-price") || 0,
+          );
+          let inDate = new Date(checkIn);
+          let outDate = new Date(checkOut);
+          let hours = Math.abs(outDate - inDate) / 36e5;
+
+          if (hours > 0 && note) {
+            let totalPrice = (hours / 24) * pricePerDay;
+            note.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shadow-sm">⏱️</div>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Duration</span>
+                        <span class="text-slate-800 font-black">${hours.toFixed(0)} ម៉ោង</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 mt-3 md:mt-0 md:border-l md:border-slate-200 md:pl-6">
+                    <div class="flex flex-col text-right">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Total Amount</span>
+                        <span class="text-2xl font-black text-blue-600">$${totalPrice.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+          }
+        } else if (note) {
+          note.innerHTML = `<div class="flex items-center gap-3"><span class="text-2xl">💡</span><span>សូមជ្រើសរើសបន្ទប់ និងម៉ោងចេញចូលដើម្បីប្រព័ន្ធគណនាតម្លៃ។</span></div>`;
+        }
+      }
+
+      function searchTable() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        document.querySelectorAll("#guestTable tbody tr").forEach((r) => {
+          r.style.display = r.innerText.toLowerCase().includes(input)
+            ? ""
+            : "none";
+        });
+      }
+
+      let html5QrcodeScanner;
+      function openScanner() {
+        document
+          .getElementById("scannerModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("scannerBox").classList.remove("scale-95");
+        }, 10);
+        html5QrcodeScanner = new Html5QrcodeScanner(
+          "reader",
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          false,
+        );
+        html5QrcodeScanner.render(
+          (t) => {
+            closeScanner();
+            switchTab("guestlist");
+            document.getElementById("searchInput").value = t.trim();
+            searchTable();
+          },
+          () => {},
+        );
+      }
+      function closeScanner() {
+        if (html5QrcodeScanner) html5QrcodeScanner.clear();
+        document.getElementById("scannerBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("scannerModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      function openBoardingPass(
+        name,
+        phone,
+        room,
+        type,
+        checkin,
+        checkout,
+        id,
+      ) {
+        document.getElementById("bp_name").innerText = name;
+        document.getElementById("bp_phone").innerText = phone;
+        document.getElementById("bp_room").innerText = room;
+        document.getElementById("bp_room_small").innerText = room;
+        document.getElementById("bp_type").innerText = type;
+        document.getElementById("bp_in").innerText = checkin;
+        document.getElementById("bp_out").innerText = checkout;
+
+        let formatCode = "BK-" + id + "-" + room;
+        JsBarcode("#bp_barcode", formatCode, {
+          format: "CODE128",
+          width: 1.5,
+          height: 35,
+          displayValue: true,
+          fontSize: 11,
+          margin: 0,
+          lineColor: "#0F172A",
+        });
+        document.getElementById("bp_qr").src =
+          "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
+          encodeURIComponent(formatCode);
+
+        document
+          .getElementById("boardingPassModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("bpBox").classList.remove("scale-95");
+        }, 10);
+      }
+      function closeBoardingPass() {
+        document.getElementById("bpBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("boardingPassModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      function openEditModal(id, name, phone, roomId) {
+        document.getElementById("edit_id").value = id;
+        document.getElementById("edit_name").value = name;
+        document.getElementById("edit_phone").value = phone;
+        document.getElementById("edit_room_id").value = roomId;
+        document
+          .getElementById("editModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("editBox").classList.remove("scale-95");
+        }, 10);
+      }
+      function closeEditModal() {
+        document.getElementById("editBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("editModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+    </script>
+  </body>
+</html>
