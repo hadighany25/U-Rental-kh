@@ -136,12 +136,10 @@ app.post("/api/auth/register", async (req, res) => {
     const { username, fullname, phone, password } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { phone }] });
     if (existingUser)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
+      });
 
     const newUser = new User({
       username,
@@ -313,7 +311,7 @@ app.post("/api/payments/confirm", async (req, res) => {
 // =========================================================================
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("*", (req, res) => {
+app.get(/^(?!\/api).+/, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
