@@ -1,21 +1,23 @@
 // =========================================================================
 // ផ្នែកទី ១៖ ការនាំចូលបណ្ណាល័យ (Imports & Setup)
 // =========================================================================
-require("dotenv").config();
+require("dotenv").config(); // ទាញយកទិន្នន័យពី File .env
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// 🔥 កែប្រែ Port ទៅ 8080 ដើម្បីឱ្យត្រូវជាមួយស្តង់ដាររបស់ Fly.io
+const PORT = process.env.PORT || 8080;
 
+// អនុញ្ញាតឱ្យ Server ទទួលយកទិន្នន័យជា JSON ពី Frontend
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // =========================================================================
-// ផ្នែកទី ២៖ មុខងារបាញ់សារទៅកាន់ Telegram
+// ផ្នែកទី ២៖ មុខងារបាញ់សារទៅកាន់ Telegram (Telegram Notification)
 // =========================================================================
 async function sendTelegramMessage(message) {
   const token = process.env.TELEGRAM_TOKEN;
@@ -23,7 +25,7 @@ async function sendTelegramMessage(message) {
 
   if (!token || !chatId) {
     console.log(
-      "⚠️ មិនអាចបាញ់សារទៅ Telegram បានទេ ព្រោះអត់មាន Token ឬ Chat ID",
+      "⚠️ មិនអាចបាញ់សារទៅ Telegram បានទេ ព្រោះអត់មាន Token ឬ Chat ID ក្នុង .env",
     );
     return;
   }
@@ -47,19 +49,19 @@ async function sendTelegramMessage(message) {
 // =========================================================================
 // ផ្នែកទី ៣៖ ការភ្ជាប់ទៅកាន់ MongoDB Atlas
 // =========================================================================
-mongoose.set("strictQuery", false); // ការពារ Warning របស់ Mongoose
+// 🔥 កែប្រែ៖ ដកចេញនូវ options ដែលហួសសម័យ ដើម្បីកុំឱ្យ Server Crash
+mongoose.set("strictQuery", false);
 
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ ភ្ជាប់ទៅកាន់ MongoDB Atlas ជោគជ័យ!"))
   .catch((err) => console.error("❌ បរាជ័យក្នុងការភ្ជាប់ Database:", err));
 
 // =========================================================================
 // ផ្នែកទី ៤៖ ការបង្កើតទម្រង់ទិន្នន័យ (Mongoose Schemas & Models)
 // =========================================================================
+
+// ១. តារាងអ្នកប្រើប្រាស់ (Users Table)
 const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true },
@@ -72,11 +74,13 @@ const UserSchema = new mongoose.Schema(
 );
 const User = mongoose.model("User", UserSchema);
 
+// ២. តារាងប្រភេទបន្ទប់ (Room Types Table)
 const RoomTypeSchema = new mongoose.Schema({
   type_name: { type: String, required: true, unique: true },
 });
 const RoomType = mongoose.model("RoomType", RoomTypeSchema);
 
+// ៣. តារាងបន្ទប់ (Rooms Table)
 const RoomSchema = new mongoose.Schema({
   room_number: { type: String, required: true, unique: true },
   type_id: { type: mongoose.Schema.Types.ObjectId, ref: "RoomType" },
@@ -89,6 +93,7 @@ const RoomSchema = new mongoose.Schema({
 });
 const Room = mongoose.model("Room", RoomSchema);
 
+// ៤. តារាងការកក់ (Bookings Table)
 const BookingSchema = new mongoose.Schema(
   {
     room_id: {
@@ -124,17 +129,17 @@ const Booking = mongoose.model("Booking", BookingSchema);
 // =========================================================================
 // ផ្នែកទី ៥៖ API សម្រាប់អ្នកប្រើប្រាស់ (Auth: Login & Register)
 // =========================================================================
+
+// API ចុះឈ្មោះ (Register)
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { username, fullname, phone, password } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { phone }] });
     if (existingUser)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
+      });
 
     const newUser = new User({
       username,
@@ -150,9 +155,12 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
+// API ចូលគណនី (Login)
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    // Admin Login
     if (username.toLowerCase() === "admin" && password === "123") {
       return res.json({
         success: true,
@@ -161,6 +169,7 @@ app.post("/api/auth/login", async (req, res) => {
       });
     }
 
+    // Tenant Login
     const user = await User.findOne({
       $or: [{ username }, { phone: username }],
     });
@@ -208,6 +217,7 @@ app.get("/api/rooms/available", async (req, res) => {
 // =========================================================================
 // ផ្នែកទី ៧៖ API សម្រាប់ការកក់ (Bookings & Telegram Alert)
 // =========================================================================
+
 app.get("/api/bookings/check_availability/:roomId", async (req, res) => {
   try {
     const { roomId } = req.params;
@@ -215,6 +225,7 @@ app.get("/api/bookings/check_availability/:roomId", async (req, res) => {
       room_id: roomId,
       status: { $ne: "checked_out" },
     }).select("check_in_time check_out_time");
+
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -233,6 +244,7 @@ app.post("/api/bookings/create", async (req, res) => {
       payment_method,
       status,
     } = req.body;
+
     const conflict = await Booking.findOne({
       room_id,
       status: { $ne: "checked_out" },
@@ -257,12 +269,15 @@ app.post("/api/bookings/create", async (req, res) => {
       payment_method,
       status,
     });
+
     await newBooking.save();
 
-    if (status === "checked_in")
+    if (status === "checked_in") {
       await Room.findByIdAndUpdate(room_id, { status: "occupied" });
+    }
 
-    const msg_tele = `🌐 មានការកក់បន្ទប់ថ្មី:\n🏢 បន្ទប់លេខ (ID): ${room_id}\n👤 ភ្ញៀវ: ${tenant_name}\n📱 លេខ: ${tenant_phone}\n📅 ម៉ោងចូល: ${check_in_time}\n💳 បង់តាម: ${payment_method.toUpperCase()}`;
+    // 🔥 បាញ់សារទៅ Telegram បន្ទាប់ពីកក់ចូល Database រួច
+    const msg_tele = `🌐 មានការកក់បន្ទប់ថ្មី:\n🏢 បន្ទប់លេខ (ID): ${room_id}\n👤 ភ្ញៀវ: ${tenant_name}\n📱 លេខទូរស័ព្ទ: ${tenant_phone}\n📅 ម៉ោងចូល: ${check_in_time}\n💳 បង់តាម: ${payment_method.toUpperCase()}`;
     await sendTelegramMessage(msg_tele);
 
     res.json({
@@ -296,7 +311,6 @@ app.post("/api/payments/confirm", async (req, res) => {
 // =========================================================================
 app.use(express.static(path.join(__dirname, "public")));
 
-// ប្រើប្រាស់ Middleware ចុងក្រោយគេបង្អស់ដើម្បីដោះស្រាយបញ្ហា SPA routing ជំនួសឱ្យ app.get('*')
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
     return res
