@@ -1,23 +1,21 @@
 // =========================================================================
 // ផ្នែកទី ១៖ ការនាំចូលបណ្ណាល័យ (Imports & Setup)
 // =========================================================================
-require("dotenv").config(); // ទាញយកទិន្នន័យពី File .env
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 
 const app = express();
-// 🔥 កែប្រែ Port ទៅ 8080 ដើម្បីឱ្យត្រូវជាមួយស្តង់ដាររបស់ Fly.io
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080; // Fly.io ត្រូវការ Port 8080
 
-// អនុញ្ញាតឱ្យ Server ទទួលយកទិន្នន័យជា JSON ពី Frontend
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // =========================================================================
-// ផ្នែកទី ២៖ មុខងារបាញ់សារទៅកាន់ Telegram (Telegram Notification)
+// ផ្នែកទី ២៖ មុខងារបាញ់សារទៅកាន់ Telegram
 // =========================================================================
 async function sendTelegramMessage(message) {
   const token = process.env.TELEGRAM_TOKEN;
@@ -25,7 +23,7 @@ async function sendTelegramMessage(message) {
 
   if (!token || !chatId) {
     console.log(
-      "⚠️ មិនអាចបាញ់សារទៅ Telegram បានទេ ព្រោះអត់មាន Token ឬ Chat ID ក្នុង .env",
+      "⚠️ មិនអាចបាញ់សារទៅ Telegram បានទេ ព្រោះអត់មាន Token ឬ Chat ID",
     );
     return;
   }
@@ -35,10 +33,7 @@ async function sendTelegramMessage(message) {
     await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-      }),
+      body: JSON.stringify({ chat_id: chatId, text: message }),
     });
     console.log("✅ បានបាញ់សារជូនដំណឹងទៅកាន់ Telegram!");
   } catch (error) {
@@ -49,9 +44,7 @@ async function sendTelegramMessage(message) {
 // =========================================================================
 // ផ្នែកទី ៣៖ ការភ្ជាប់ទៅកាន់ MongoDB Atlas
 // =========================================================================
-// 🔥 កែប្រែ៖ ដកចេញនូវ options ដែលហួសសម័យ ដើម្បីកុំឱ្យ Server Crash
 mongoose.set("strictQuery", false);
-
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ ភ្ជាប់ទៅកាន់ MongoDB Atlas ជោគជ័យ!"))
@@ -60,86 +53,89 @@ mongoose
 // =========================================================================
 // ផ្នែកទី ៤៖ ការបង្កើតទម្រង់ទិន្នន័យ (Mongoose Schemas & Models)
 // =========================================================================
-
-// ១. តារាងអ្នកប្រើប្រាស់ (Users Table)
-const UserSchema = new mongoose.Schema(
-  {
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    fullname: { type: String, required: true },
-    phone: { type: String, required: true, unique: true },
-    role: { type: String, enum: ["admin", "tenant"], default: "tenant" },
-  },
-  { timestamps: true },
-);
-const User = mongoose.model("User", UserSchema);
-
-// ២. តារាងប្រភេទបន្ទប់ (Room Types Table)
-const RoomTypeSchema = new mongoose.Schema({
-  type_name: { type: String, required: true, unique: true },
-});
-const RoomType = mongoose.model("RoomType", RoomTypeSchema);
-
-// ៣. តារាងបន្ទប់ (Rooms Table)
-const RoomSchema = new mongoose.Schema({
-  room_number: { type: String, required: true, unique: true },
-  type_id: { type: mongoose.Schema.Types.ObjectId, ref: "RoomType" },
-  price: { type: Number, required: true },
-  status: {
-    type: String,
-    enum: ["available", "occupied"],
-    default: "available",
-  },
-});
-const Room = mongoose.model("Room", RoomSchema);
-
-// ៤. តារាងការកក់ (Bookings Table)
-const BookingSchema = new mongoose.Schema(
-  {
-    room_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
-      required: true,
+const User = mongoose.model(
+  "User",
+  new mongoose.Schema(
+    {
+      username: { type: String, required: true, unique: true },
+      password: { type: String, required: true },
+      fullname: { type: String, required: true },
+      phone: { type: String, required: true, unique: true },
+      role: { type: String, enum: ["admin", "tenant"], default: "tenant" },
     },
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-    tenant_name: { type: String, required: true },
-    tenant_phone: { type: String, required: true },
-    check_in_time: { type: Date, required: true },
-    check_out_time: { type: Date, required: true },
+    { timestamps: true },
+  ),
+);
+
+const RoomType = mongoose.model(
+  "RoomType",
+  new mongoose.Schema({
+    type_name: { type: String, required: true, unique: true },
+  }),
+);
+
+const Room = mongoose.model(
+  "Room",
+  new mongoose.Schema({
+    room_number: { type: String, required: true, unique: true },
+    type_id: { type: mongoose.Schema.Types.ObjectId, ref: "RoomType" },
+    price: { type: Number, required: true },
     status: {
       type: String,
-      enum: ["booked", "checked_in", "checked_out", "pending"],
-      default: "booked",
+      enum: ["available", "occupied"],
+      default: "available",
     },
-    payment_method: {
-      type: String,
-      enum: ["cash", "online", "card"],
-      default: "cash",
-    },
-    payment_status: {
-      type: String,
-      enum: ["unpaid", "paid"],
-      default: "unpaid",
-    },
-  },
-  { timestamps: true },
+  }),
 );
-const Booking = mongoose.model("Booking", BookingSchema);
+
+const Booking = mongoose.model(
+  "Booking",
+  new mongoose.Schema(
+    {
+      room_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room",
+        required: true,
+      },
+      user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      tenant_name: { type: String, required: true },
+      tenant_phone: { type: String, required: true },
+      check_in_time: { type: Date, required: true },
+      check_out_time: { type: Date, required: true },
+      status: {
+        type: String,
+        enum: ["booked", "checked_in", "checked_out", "pending"],
+        default: "booked",
+      },
+      payment_method: {
+        type: String,
+        enum: ["cash", "online", "card"],
+        default: "cash",
+      },
+      payment_status: {
+        type: String,
+        enum: ["unpaid", "paid"],
+        default: "unpaid",
+      },
+    },
+    { timestamps: true },
+  ),
+);
 
 // =========================================================================
-// ផ្នែកទី ៥៖ API សម្រាប់អ្នកប្រើប្រាស់ (Auth: Login & Register)
+// ផ្នែកទី ៥៖ API អ្នកប្រើប្រាស់ (Auth - Login/Register)
 // =========================================================================
-
-// API ចុះឈ្មោះ (Register)
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { username, fullname, phone, password } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { phone }] });
     if (existingUser)
-      return res.status(400).json({
-        success: false,
-        message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
-      });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
+        });
 
     const newUser = new User({
       username,
@@ -155,12 +151,9 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-// API ចូលគណនី (Login)
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-
-    // Admin Login
     if (username.toLowerCase() === "admin" && password === "123") {
       return res.json({
         success: true,
@@ -169,7 +162,6 @@ app.post("/api/auth/login", async (req, res) => {
       });
     }
 
-    // Tenant Login
     const user = await User.findOne({
       $or: [{ username }, { phone: username }],
     });
@@ -194,44 +186,89 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 // =========================================================================
-// ផ្នែកទី ៦៖ API សម្រាប់គ្រប់គ្រងបន្ទប់ (Rooms & Types)
+// ផ្នែកទី ៦៖ API គ្រប់គ្រងបន្ទប់ និងប្រភេទបន្ទប់ (Rooms & Room Types)
 // =========================================================================
+// ទាញយកប្រភេទបន្ទប់
+app.get("/api/room-types", async (req, res) => {
+  try {
+    const types = await RoomType.find();
+    res.json(types);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// បង្កើតប្រភេទបន្ទប់
+app.post("/api/room-types", async (req, res) => {
+  try {
+    const newType = new RoomType({ type_name: req.body.type_name });
+    await newType.save();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// លុបប្រភេទបន្ទប់
+app.delete("/api/room-types/:id", async (req, res) => {
+  try {
+    await RoomType.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// ទាញយកបន្ទប់ទាំងអស់
 app.get("/api/rooms", async (req, res) => {
   try {
-    const rooms = await Room.find().populate("type_id");
+    const rooms = await Room.find()
+      .populate("type_id")
+      .sort({ room_number: 1 });
     res.json(rooms);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get("/api/rooms/available", async (req, res) => {
+// បង្កើតបន្ទប់ថ្មី
+app.post("/api/rooms", async (req, res) => {
   try {
-    const rooms = await Room.find({ status: "available" }).populate("type_id");
-    res.json(rooms);
+    const newRoom = new Room(req.body);
+    await newRoom.save();
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// លុបបន្ទប់
+app.delete("/api/rooms/:id", async (req, res) => {
+  try {
+    await Room.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false });
   }
 });
 
 // =========================================================================
-// ផ្នែកទី ៧៖ API សម្រាប់ការកក់ (Bookings & Telegram Alert)
+// ផ្នែកទី ៧៖ API សម្រាប់ការកក់ និងប្រវត្តិការជួល (Bookings & Stats)
 // =========================================================================
-
+// ឆែកម៉ោងកក់
 app.get("/api/bookings/check_availability/:roomId", async (req, res) => {
   try {
-    const { roomId } = req.params;
     const bookings = await Booking.find({
-      room_id: roomId,
+      room_id: req.params.roomId,
       status: { $ne: "checked_out" },
     }).select("check_in_time check_out_time");
-
     res.json(bookings);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
+// បង្កើតការកក់ (Admin & Tenant)
 app.post("/api/bookings/create", async (req, res) => {
   try {
     const {
@@ -244,7 +281,6 @@ app.post("/api/bookings/create", async (req, res) => {
       payment_method,
       status,
     } = req.body;
-
     const conflict = await Booking.findOne({
       room_id,
       status: { $ne: "checked_out" },
@@ -269,15 +305,12 @@ app.post("/api/bookings/create", async (req, res) => {
       payment_method,
       status,
     });
-
     await newBooking.save();
 
-    if (status === "checked_in") {
+    if (status === "checked_in")
       await Room.findByIdAndUpdate(room_id, { status: "occupied" });
-    }
 
-    // 🔥 បាញ់សារទៅ Telegram បន្ទាប់ពីកក់ចូល Database រួច
-    const msg_tele = `🌐 មានការកក់បន្ទប់ថ្មី:\n🏢 បន្ទប់លេខ (ID): ${room_id}\n👤 ភ្ញៀវ: ${tenant_name}\n📱 លេខទូរស័ព្ទ: ${tenant_phone}\n📅 ម៉ោងចូល: ${check_in_time}\n💳 បង់តាម: ${payment_method.toUpperCase()}`;
+    const msg_tele = `🌐 មានការកក់បន្ទប់ថ្មី:\n🏢 បន្ទប់លេខ (ID): ${room_id}\n👤 ភ្ញៀវ: ${tenant_name}\n📱 លេខ: ${tenant_phone}\n📅 ម៉ោងចូល: ${check_in_time}\n💳 បង់តាម: ${payment_method.toUpperCase()}`;
     await sendTelegramMessage(msg_tele);
 
     res.json({
@@ -287,6 +320,60 @@ app.post("/api/bookings/create", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ទាញយកប្រវត្តិការកក់សម្រាប់ភ្ញៀវ (Tenant Dashboard)
+app.get("/api/bookings/my/:userId/:phone", async (req, res) => {
+  try {
+    const { userId, phone } = req.params;
+    const query =
+      userId !== "null"
+        ? { $or: [{ user_id: userId }, { tenant_phone: phone }] }
+        : { tenant_phone: phone };
+    const bookings = await Booking.find(query)
+      .populate({ path: "room_id", populate: { path: "type_id" } })
+      .sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ទាញយកការកក់ទាំងអស់សម្រាប់ Admin
+app.get("/api/bookings", async (req, res) => {
+  try {
+    const bookings = await Booking.find({ status: { $ne: "checked_out" } })
+      .populate({ path: "room_id", populate: { path: "type_id" } })
+      .sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Check-in / Check-out សម្រាប់ Admin
+app.put("/api/bookings/:id/status", async (req, res) => {
+  try {
+    const { status, room_id } = req.body;
+    await Booking.findByIdAndUpdate(req.params.id, { status });
+    if (status === "checked_in")
+      await Room.findByIdAndUpdate(room_id, { status: "occupied" });
+    if (status === "checked_out")
+      await Room.findByIdAndUpdate(room_id, { status: "available" });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// លុបការកក់
+app.delete("/api/bookings/:id", async (req, res) => {
+  try {
+    await Booking.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false });
   }
 });
 
@@ -307,10 +394,58 @@ app.post("/api/payments/confirm", async (req, res) => {
 });
 
 // =========================================================================
-// ផ្នែកទី ៩៖ ការកំណត់ Static Files សម្រាប់ Frontend
+// ផ្នែកទី ៩៖ API សម្រាប់ Admin Dashboard Stats & Floor Plan
+// =========================================================================
+app.get("/api/stats", async (req, res) => {
+  try {
+    const total_rooms = await Room.countDocuments();
+    const occupied_rooms = await Room.countDocuments({ status: "occupied" });
+    const pending_bookings = await Booking.countDocuments({ status: "booked" });
+
+    // Revenue
+    const paidBookings = await Booking.find({
+      payment_status: "paid",
+    }).populate("room_id");
+    const revenue = paidBookings.reduce(
+      (sum, b) => sum + (b.room_id ? b.room_id.price : 0),
+      0,
+    );
+
+    // Chart Data (Last 7 Days)
+    let chart_labels = [];
+    let chart_data = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      chart_labels.push(d.toLocaleDateString("en-US", { weekday: "short" }));
+
+      const startOfDay = new Date(d.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(d.setHours(23, 59, 59, 999));
+      const count = await Booking.countDocuments({
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      });
+      chart_data.push(count);
+    }
+
+    res.json({
+      total_rooms,
+      occupied_rooms,
+      pending_bookings,
+      revenue,
+      chart_labels,
+      chart_data,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// =========================================================================
+// ផ្នែកទី ១០៖ ការកំណត់ Static Files សម្រាប់ Frontend (React/HTML)
 // =========================================================================
 app.use(express.static(path.join(__dirname, "public")));
 
+// ត្រូវប្រាកដថា Middleware នេះនៅខាងក្រោមគេបង្អស់
 app.use((req, res, next) => {
   if (req.path.startsWith("/api")) {
     return res
@@ -321,9 +456,8 @@ app.use((req, res, next) => {
 });
 
 // =========================================================================
-// ផ្នែកទី ១០៖ ចាប់ផ្តើមដំណើរការ Server (Start Server)
+// ចាប់ផ្តើម Server
 // =========================================================================
-// បន្ថែម "0.0.0.0" ដើម្បីឱ្យ Fly.io អាចចាប់យក Network ពីខាងក្រៅបាន
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server កំពុងដំណើរការលើ Port: ${PORT}`);
 });

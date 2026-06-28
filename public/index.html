@@ -295,7 +295,6 @@
         </button>
       </form>
     </div>
-
     <script>
       // មុខងារដូរ Tab រវាង Login និង Register
       function switchTab(type) {
@@ -303,8 +302,6 @@
         let rForm = document.getElementById("registerForm");
         let lBtn = document.getElementById("btn-login");
         let rBtn = document.getElementById("btn-register");
-
-        // លាក់សារ Error/Success ពេលប្ដូរ Tab
         document.getElementById("alertBox").classList.add("hidden");
 
         if (type === "login") {
@@ -312,7 +309,6 @@
           setTimeout(() => {
             lForm.classList.add("active");
           }, 100);
-
           lBtn.className =
             "flex-1 py-2.5 rounded-lg text-sm font-bold transition-all shadow bg-white text-[#0B1120]";
           rBtn.className =
@@ -322,7 +318,6 @@
           setTimeout(() => {
             rForm.classList.add("active");
           }, 100);
-
           rBtn.className =
             "flex-1 py-2.5 rounded-lg text-sm font-bold transition-all shadow bg-white text-[#0B1120]";
           lBtn.className =
@@ -330,12 +325,10 @@
         }
       }
 
-      // មុខងារបង្ហាញសារ (ជំនួសឱ្យ PHP Error/Success messages)
       function showAlert(message, type) {
         const alertBox = document.getElementById("alertBox");
         const alertMessage = document.getElementById("alertMessage");
         const alertIcon = document.getElementById("alertIcon");
-
         alertBox.classList.remove(
           "hidden",
           "bg-red-50",
@@ -346,7 +339,6 @@
           "text-emerald-600",
         );
         alertMessage.innerText = message;
-
         if (type === "error") {
           alertBox.classList.add(
             "bg-red-50",
@@ -368,37 +360,63 @@
         }
       }
 
-      // ចាប់យកទិន្នន័យពេលចុច Login
-      function handleLogin(event) {
-        event.preventDefault(); // ទប់កុំឱ្យវា Refresh ទំព័រ
+      // មុខងារ Login ពិតប្រាកដ
+      async function handleLogin(event) {
+        event.preventDefault();
         const username = document.getElementById("loginUsername").value;
         const password = document.getElementById("loginPassword").value;
 
-        console.log("កំពុងរៀបចំបាញ់ API Login:", { username, password });
+        try {
+          let response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          let data = await response.json();
 
-        // កន្លែងនេះយើងនឹងប្រើ fetch() ទៅកាន់ Node.js API នៅពេលក្រោយ
-        // ឧទាហរណ៍បណ្ដោះអាសន្ន៖
-        showAlert("កំពុងតភ្ជាប់ទៅកាន់ Server (API មិនទាន់រួចរាល់)...", "error");
+          if (data.success) {
+            // រក្សាទុក session ក្នុង localStorage
+            localStorage.setItem("user_id", data.user ? data.user.id : "admin");
+
+            if (data.role === "admin") {
+              window.location.href = "/admin.html";
+            } else {
+              window.location.href = "/dashboard.html";
+            }
+          } else {
+            showAlert(data.message, "error");
+          }
+        } catch (err) {
+          showAlert("បរាជ័យក្នុងការភ្ជាប់ទៅ Server", "error");
+        }
       }
 
-      // ចាប់យកទិន្នន័យពេលចុច Register
-      function handleRegister(event) {
+      // មុខងារ Register ពិតប្រាកដ
+      async function handleRegister(event) {
         event.preventDefault();
         const username = document.getElementById("regUsername").value;
         const fullname = document.getElementById("regFullname").value;
         const phone = document.getElementById("regPhone").value;
         const password = document.getElementById("regPassword").value;
 
-        console.log("កំពុងរៀបចំបាញ់ API Register:", {
-          username,
-          fullname,
-          phone,
-          password,
-        });
+        try {
+          let response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, fullname, phone, password }),
+          });
+          let data = await response.json();
 
-        // កន្លែងនេះយើងនឹងប្រើ fetch() ទៅកាន់ Node.js API នៅពេលក្រោយ
-        // ឧទាហរណ៍បណ្ដោះអាសន្ន៖
-        showAlert("កំពុងតភ្ជាប់ទៅកាន់ Server (API មិនទាន់រួចរាល់)...", "error");
+          if (data.success) {
+            showAlert(data.message, "success");
+            document.getElementById("registerForm").reset();
+            setTimeout(() => switchTab("login"), 2000);
+          } else {
+            showAlert(data.message, "error");
+          }
+        } catch (err) {
+          showAlert("បរាជ័យក្នុងការភ្ជាប់ទៅ Server", "error");
+        }
       }
     </script>
   </body>
