@@ -46,7 +46,9 @@ async function sendTelegramMessage(message) {
 // =========================================================================
 mongoose.set("strictQuery", false);
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    family: 4, // បង្ខំឱ្យប្រព័ន្ធប្រើ IPv4 ដើម្បីដោះស្រាយបញ្ហា Timeout លើ Node 18+ និង Fly.io
+  })
   .then(() => console.log("✅ ភ្ជាប់ទៅកាន់ MongoDB Atlas ជោគជ័យ!"))
   .catch((err) => console.error("❌ បរាជ័យក្នុងការភ្ជាប់ Database:", err));
 
@@ -130,12 +132,10 @@ app.post("/api/auth/register", async (req, res) => {
     const { username, fullname, phone, password } = req.body;
     const existingUser = await User.findOne({ $or: [{ username }, { phone }] });
     if (existingUser)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "ឈ្មោះ ឬលេខទូរស័ព្ទនេះមានគេប្រើរួចហើយ!",
+      });
 
     const newUser = new User({
       username,
