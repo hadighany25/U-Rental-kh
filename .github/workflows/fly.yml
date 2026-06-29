@@ -2,7 +2,7 @@ name: Fly Deploy
 on:
   push:
     branches:
-      - main # ឬដូរទៅជា master ប្រសិនបើ GitHub របស់អ្នកប្រើ Branch master
+      - main # ឬ master អាស្រ័យលើឈ្មោះ Branch របស់អ្នក
 
 jobs:
   deploy:
@@ -17,6 +17,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly.io
-        run: fly deploy --remote-only
+        run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
