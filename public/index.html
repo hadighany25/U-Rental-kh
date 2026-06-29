@@ -295,13 +295,14 @@
         </button>
       </form>
     </div>
+
     <script>
-      // មុខងារដូរ Tab រវាង Login និង Register
       function switchTab(type) {
         let lForm = document.getElementById("loginForm");
         let rForm = document.getElementById("registerForm");
         let lBtn = document.getElementById("btn-login");
         let rBtn = document.getElementById("btn-register");
+
         document.getElementById("alertBox").classList.add("hidden");
 
         if (type === "login") {
@@ -309,6 +310,7 @@
           setTimeout(() => {
             lForm.classList.add("active");
           }, 100);
+
           lBtn.className =
             "flex-1 py-2.5 rounded-lg text-sm font-bold transition-all shadow bg-white text-[#0B1120]";
           rBtn.className =
@@ -318,6 +320,7 @@
           setTimeout(() => {
             rForm.classList.add("active");
           }, 100);
+
           rBtn.className =
             "flex-1 py-2.5 rounded-lg text-sm font-bold transition-all shadow bg-white text-[#0B1120]";
           lBtn.className =
@@ -329,6 +332,7 @@
         const alertBox = document.getElementById("alertBox");
         const alertMessage = document.getElementById("alertMessage");
         const alertIcon = document.getElementById("alertIcon");
+
         alertBox.classList.remove(
           "hidden",
           "bg-red-50",
@@ -339,6 +343,7 @@
           "text-emerald-600",
         );
         alertMessage.innerText = message;
+
         if (type === "error") {
           alertBox.classList.add(
             "bg-red-50",
@@ -360,13 +365,18 @@
         }
       }
 
-      // មុខងារ Login ពិតប្រាកដ
+      // 🔥 នេះជាកូដដែលទាក់ទងជាមួយ Backend ពិតប្រាកដ ១០០%
       async function handleLogin(event) {
         event.preventDefault();
         const username = document.getElementById("loginUsername").value;
         const password = document.getElementById("loginPassword").value;
+        const btn = event.target.querySelector('button[type="submit"]');
+
+        btn.innerHTML = "កំពុងផ្ទៀងផ្ទាត់...";
+        btn.disabled = true;
 
         try {
+          // បាញ់ Request ទៅកាន់ API ក្នុង server.js
           let response = await fetch("/api/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -375,31 +385,51 @@
           let data = await response.json();
 
           if (data.success) {
-            // រក្សាទុក session ក្នុង localStorage
-            localStorage.setItem("user_id", data.user ? data.user.id : "admin");
+            showAlert("ចូលគណនីជោគជ័យ! កំពុងបញ្ជូន...", "success");
 
-            if (data.role === "admin") {
-              window.location.href = "/admin.html";
-            } else {
-              window.location.href = "/dashboard.html";
+            // រក្សាទុកព័ត៌មានភ្ញៀវ ដើម្បីឱ្យផ្ទាំង Dashboard អាចទាញយកទៅបង្ហាញបាន
+            if (data.user) {
+              localStorage.setItem("user_id", data.user.id);
+              localStorage.setItem("user_phone", data.user.phone);
+              localStorage.setItem("user_name", data.user.fullname);
             }
+
+            // ផ្លាស់ប្តូរទំព័រដោយស្វ័យប្រវត្តិ
+            setTimeout(() => {
+              if (data.role === "admin") {
+                window.location.href = "/admin.html";
+              } else {
+                window.location.href = "/dashboard.html";
+              }
+            }, 1000);
           } else {
             showAlert(data.message, "error");
+            btn.innerHTML =
+              'ចូលប្រព័ន្ធ <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
+            btn.disabled = false;
           }
         } catch (err) {
+          console.error(err);
           showAlert("បរាជ័យក្នុងការភ្ជាប់ទៅ Server", "error");
+          btn.innerHTML =
+            'ចូលប្រព័ន្ធ <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>';
+          btn.disabled = false;
         }
       }
 
-      // មុខងារ Register ពិតប្រាកដ
       async function handleRegister(event) {
         event.preventDefault();
         const username = document.getElementById("regUsername").value;
         const fullname = document.getElementById("regFullname").value;
         const phone = document.getElementById("regPhone").value;
         const password = document.getElementById("regPassword").value;
+        const btn = event.target.querySelector('button[type="submit"]');
+
+        btn.innerHTML = "កំពុងបង្កើតគណនី...";
+        btn.disabled = true;
 
         try {
+          // បាញ់ Request ទៅកាន់ API ក្នុង server.js
           let response = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -410,12 +440,24 @@
           if (data.success) {
             showAlert(data.message, "success");
             document.getElementById("registerForm").reset();
-            setTimeout(() => switchTab("login"), 2000);
+            setTimeout(() => {
+              switchTab("login");
+              btn.innerHTML =
+                'បង្កើតគណនីថ្មី <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>';
+              btn.disabled = false;
+            }, 2000);
           } else {
             showAlert(data.message, "error");
+            btn.innerHTML =
+              'បង្កើតគណនីថ្មី <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>';
+            btn.disabled = false;
           }
         } catch (err) {
+          console.error(err);
           showAlert("បរាជ័យក្នុងការភ្ជាប់ទៅ Server", "error");
+          btn.innerHTML =
+            'បង្កើតគណនីថ្មី <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>';
+          btn.disabled = false;
         }
       }
     </script>
