@@ -1,5 +1,5 @@
 # ប្រើ Node.js version 18 (ឬខ្ពស់ជាងនេះ)
-FROM node:18-slim
+FROM node:20-slim
 
 # កំណត់ Folder ធ្វើការ
 WORKDIR /app
