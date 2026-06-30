@@ -386,7 +386,8 @@
 
           if (data.success) {
             showAlert("ចូលគណនីជោគជ័យ! កំពុងបញ្ជូន...", "success");
-
+            // 👉 សូមបន្ថែមជួរនេះចូល (ដើម្បីប្រាប់ប្រព័ន្ធថាគាត់ជាអ្នកណា)
+            localStorage.setItem("user_role", data.role);
             // រក្សាទុកព័ត៌មានភ្ញៀវ ដើម្បីឱ្យផ្ទាំង Dashboard អាចទាញយកទៅបង្ហាញបាន
             if (data.user) {
               localStorage.setItem("user_id", data.user.id);
