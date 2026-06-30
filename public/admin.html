@@ -1456,11 +1456,11 @@
             '<option value="" disabled selected>-- ជ្រើសរើសប្រភេទ --</option>';
           types.forEach((t) => {
             typesHtml += `<tr class="hover:bg-slate-50 group">
-                                  <td class="py-2 font-medium text-slate-700">${t.type_name}</td>
-                                  <td class="py-2 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <button onclick="deleteType('${t._id}')" class="text-red-500 hover:text-red-700">🗑️</button>
-                                  </td>
-                              </tr>`;
+                                        <td class="py-2 font-medium text-slate-700">${t.type_name}</td>
+                                        <td class="py-2 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button onclick="deleteType('${t._id}')" class="text-red-500 hover:text-red-700">🗑️</button>
+                                        </td>
+                                    </tr>`;
             typeSelectHtml += `<option value='${t._id}'>${t.type_name}</option>`;
           });
           document.getElementById("roomTypesList").innerHTML = typesHtml;
@@ -1500,36 +1500,44 @@
 
             if (!isOccupied) {
               floorPlanHtml += `
-                      <div onclick="gotoBooking('${r._id}')" class="border-2 rounded-2xl p-6 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md">
-                          <div class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onclick="event.stopPropagation(); openEditRoomModal('${r._id}', '${r.room_number}', '${r.type_id ? r.type_id._id : ""}', '${r.price}')" class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">✏️</button>
-                              <button onclick="event.stopPropagation(); deleteRoom('${r._id}')" class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">🗑️</button>
-                          </div>
-                          <span class="text-3xl font-black tracking-tight">${r.room_number}</span>
-                          <span class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${r.type_id ? r.type_id.type_name : "N/A"} <span class="text-slate-400">($${r.price})</span></span>
-                      </div>`;
+                            <div onclick="gotoBooking('${r._id}')" class="border-2 rounded-2xl p-6 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md">
+                                <div class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="event.stopPropagation(); openEditRoomModal('${r._id}', '${r.room_number}', '${r.type_id ? r.type_id._id : ""}', '${r.price}')" class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">✏️</button>
+                                    <button onclick="event.stopPropagation(); deleteRoom('${r._id}')" class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">🗑️</button>
+                                </div>
+                                <span class="text-3xl font-black tracking-tight">${r.room_number}</span>
+                                <span class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${r.type_id ? r.type_id.type_name : "N/A"} <span class="text-slate-400">($${r.price})</span></span>
+                            </div>`;
             } else {
               let onClickAction = activeBooking
                 ? `openRoomDetails('${r.room_number}', '${activeBooking.tenant_name}', '${activeBooking.tenant_phone}', '${new Date(activeBooking.check_in_time).toLocaleString()}', '${new Date(activeBooking.check_out_time).toLocaleString()}')`
                 : ``;
 
               floorPlanHtml += `
-                      <div onclick="${onClickAction}" class="border-2 rounded-2xl p-6 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md">
-                          <div class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onclick="event.stopPropagation(); openEditRoomModal('${r._id}', '${r.room_number}', '${r.type_id ? r.type_id._id : ""}', '${r.price}')" class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">✏️</button>
-                              <button onclick="event.stopPropagation(); deleteRoom('${r._id}')" class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">🗑️</button>
-                          </div>
-                          <span class="absolute top-3 right-3 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
-                          <span class="text-3xl font-black tracking-tight">${r.room_number}</span>
-                          <span class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${r.type_id ? r.type_id.type_name : "N/A"}</span>
-                      </div>`;
+                            <div onclick="${onClickAction}" class="border-2 rounded-2xl p-6 bg-red-50 border-red-200 text-red-700 hover:bg-red-100 flex flex-col items-center justify-center relative transition transform cursor-pointer group shadow-sm hover:shadow-md">
+                                <div class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="event.stopPropagation(); openEditRoomModal('${r._id}', '${r.room_number}', '${r.type_id ? r.type_id._id : ""}', '${r.price}')" class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">✏️</button>
+                                    <button onclick="event.stopPropagation(); deleteRoom('${r._id}')" class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">🗑️</button>
+                                </div>
+                                <span class="absolute top-3 right-3 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>
+                                <span class="text-3xl font-black tracking-tight">${r.room_number}</span>
+                                <span class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${r.type_id ? r.type_id.type_name : "N/A"}</span>
+                            </div>`;
             }
           });
           document.getElementById("floorplanGrid").innerHTML = floorPlanHtml;
 
           // រៀបចំ Guest Database និង Recent Activity
+
           bookings.forEach((b, i) => {
-            let refCode = `BK-${b._id.substring(b._id.length - 6).toUpperCase()}-${b.room_id ? b.room_id.room_number : "N/A"}`;
+            // កាត់យក ID 6 ខ្ទង់ចុងក្រោយ និងយកលេខបន្ទប់
+            let shortId = (b._id || b.id).slice(-6).toUpperCase();
+            let roomNum = b.room_id
+              ? b.room_id.room_number
+              : b.room_number || "N/A";
+
+            // លទ្ធផលទទួលបានដូចជា៖ BK-A1B2C3-102
+            let refCode = `BK-${shortId}-${roomNum}`;
 
             if (i < 5) {
               let color = b.status === "checked_in" ? "#10b981" : "#3b82f6";
@@ -1540,11 +1548,11 @@
                 minute: "2-digit",
               });
               recentHtml += `
-                      <div class="relative">
-                          <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full" style="background: ${color}; box-shadow: 0 0 0 4px white"></div>
-                          <div class="text-sm font-medium text-slate-700">មានការកក់ពី ${b.tenant_name}</div>
-                          <div class="text-[11px] text-slate-400 mt-1">${dateStr}</div>
-                      </div>`;
+                  <div class="relative">
+                      <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full" style="background: ${color}; box-shadow: 0 0 0 4px white"></div>
+                      <div class="text-sm font-medium text-slate-700">មានការកក់ពី ${b.tenant_name} (${refCode})</div>
+                      <div class="text-[11px] text-slate-400 mt-1">${dateStr}</div>
+                  </div>`;
             }
 
             let inStr = new Date(b.check_in_time).toLocaleString("en-GB", {
@@ -1585,22 +1593,22 @@
                 : `<span class="text-red-500 text-[12px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg> Unpaid</span><a href="paymentadmin.html?id=${b._id}" class="text-[10px] text-blue-600 font-bold hover:text-blue-800 hover:underline inline-block mt-1 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded transition">🔄 Pay Now</a>`;
 
             guestHtml += `
-                  <tr class="hover:bg-slate-50">
-                      <td class="px-6">
-                          <div class="font-bold text-slate-800 text-base">Room ${b.room_id ? b.room_id.room_number : "N/A"}</div>
-                          <div class="text-[11px] text-blue-500 mt-1 font-mono font-bold">${refCode}</div>
-                      </td>
-                      <td class="px-6"><div class="font-bold">${b.tenant_name}</div><div class="text-slate-500 text-xs mt-1">${b.tenant_phone}</div></td>
-                      <td class="px-6 text-xs text-slate-500"><div class="text-emerald-600">IN: ${inStr}</div><div class="text-amber-600">OUT: ${outStr}</div></td>
-                      <td class="px-6"><div class="mt-2">${payBadge}</div></td>
-                      <td class="px-6"><div>${statusBadge}</div></td>
-                      <td class="px-6 text-right space-x-1">
-                          <button onclick="openBoardingPass('${b.tenant_name}','${b.tenant_phone}','${b.room_id ? b.room_id.room_number : ""}','${b.room_id && b.room_id.type_id ? b.room_id.type_id.type_name : ""}','${inStr}','${outStr}','${b._id}')" class="p-1.5 text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 rounded" title="Ticket">🎫</button>
-                          ${actionBtns}
-                          <button onclick="openEditModal('${b._id}', '${b.tenant_name}', '${b.tenant_phone}', '${b.room_id ? b.room_id._id : ""}')" class="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded" title="Edit">✏️</button>
-                          <button onclick="deleteBooking('${b._id}')" class="p-1.5 inline-block text-red-500 bg-red-50 hover:bg-red-100 rounded" title="Delete">🗑️</button>
-                      </td>
-                  </tr>`;
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6">
+                                <div class="font-bold text-slate-800 text-base">Room ${b.room_id ? b.room_id.room_number : "N/A"}</div>
+                                <div class="text-[11px] text-blue-500 mt-1 font-mono font-bold">${refCode}</div>
+                            </td>
+                            <td class="px-6"><div class="font-bold">${b.tenant_name}</div><div class="text-slate-500 text-xs mt-1">${b.tenant_phone}</div></td>
+                            <td class="px-6 text-xs text-slate-500"><div class="text-emerald-600">IN: ${inStr}</div><div class="text-amber-600">OUT: ${outStr}</div></td>
+                            <td class="px-6"><div class="mt-2">${payBadge}</div></td>
+                            <td class="px-6"><div>${statusBadge}</div></td>
+                            <td class="px-6 text-right space-x-1">
+                                <button onclick="openBoardingPass('${b.tenant_name}','${b.tenant_phone}','${b.room_id ? b.room_id.room_number : ""}','${b.room_id && b.room_id.type_id ? b.room_id.type_id.type_name : ""}','${inStr}','${outStr}','${b._id}')" class="p-1.5 text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 rounded" title="Ticket">🎫</button>
+                                ${actionBtns}
+                                <button onclick="openEditModal('${b._id}', '${b.tenant_name}', '${b.tenant_phone}', '${b.room_id ? b.room_id._id : ""}')" class="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded" title="Edit">✏️</button>
+                                <button onclick="deleteBooking('${b._id}')" class="p-1.5 inline-block text-red-500 bg-red-50 hover:bg-red-100 rounded" title="Delete">🗑️</button>
+                            </td>
+                        </tr>`;
           });
 
           document.getElementById("recentActivityBox").innerHTML =
@@ -2086,20 +2094,20 @@
           if (hours > 0 && note) {
             let totalPrice = (hours / 24) * pricePerDay;
             note.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shadow-sm">⏱️</div>
-                    <div class="flex flex-col">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Duration</span>
-                        <span class="text-slate-800 font-black">${hours.toFixed(0)} ម៉ោង</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 mt-3 md:mt-0 md:border-l md:border-slate-200 md:pl-6">
-                    <div class="flex flex-col text-right">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Total Amount</span>
-                        <span class="text-2xl font-black text-blue-600">$${totalPrice.toFixed(2)}</span>
-                    </div>
-                </div>
-            `;
+                      <div class="flex items-center gap-3">
+                          <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shadow-sm">⏱️</div>
+                          <div class="flex flex-col">
+                              <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Duration</span>
+                              <span class="text-slate-800 font-black">${hours.toFixed(0)} ម៉ោង</span>
+                          </div>
+                      </div>
+                      <div class="flex items-center gap-4 mt-3 md:mt-0 md:border-l md:border-slate-200 md:pl-6">
+                          <div class="flex flex-col text-right">
+                              <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Total Amount</span>
+                              <span class="text-2xl font-black text-blue-600">$${totalPrice.toFixed(2)}</span>
+                          </div>
+                      </div>
+                  `;
           }
         } else if (note) {
           note.innerHTML = `<div class="flex items-center gap-3"><span class="text-2xl">💡</span><span>សូមជ្រើសរើសបន្ទប់ និងម៉ោងចេញចូលដើម្បីប្រព័ន្ធគណនាតម្លៃ។</span></div>`;
