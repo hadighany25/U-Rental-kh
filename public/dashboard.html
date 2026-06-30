@@ -939,7 +939,17 @@
         );
 
         sortedRooms.forEach((r) => {
-          let isOccupied = r.status === "occupied";
+          // ឆែកមើលថាតើបន្ទប់នេះមាននៅក្នុងបញ្ជី Booking ដែរឬទេ (ដែលមិនទាន់ Check-out)
+          let activeBooking = state.bookings.find(
+            (b) =>
+              b.room_id._id === r._id &&
+              (b.status === "booked" ||
+                b.status === "checked_in" ||
+                b.status === "pending"),
+          );
+
+          // បើបន្ទប់ Occupied ស្រាប់ ឬមានគេកក់ហើយ គឺលោតពណ៌ក្រហម
+          let isOccupied = r.status === "occupied" || activeBooking;
           let bg = isOccupied
             ? "bg-red-50 border-red-200 text-red-700 shadow-sm opacity-80 cursor-not-allowed"
             : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 shadow-sm hover:shadow-lg cursor-pointer transform hover:scale-105";
