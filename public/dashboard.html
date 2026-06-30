@@ -2,7 +2,10 @@
 <html lang="km">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Tenant Dashboard - U-Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -24,40 +27,21 @@
       .tab-content {
         display: none;
         opacity: 0;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
+        transform: translateY(15px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .tab-content.active {
         display: block;
         opacity: 1;
         transform: translateY(0);
       }
+
+      /* Hide scrollbar for clean app look */
       ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
+        width: 0px;
+        height: 0px;
       }
 
-      .live-error-banner {
-        display: none;
-        background: #fef2f2;
-        color: #dc2626;
-        border: 1px solid #fca5a5;
-        padding: 12px;
-        border-radius: 8px;
-        margin-top: 15px;
-        font-weight: 600;
-        font-size: 13px;
-      }
       .slot-tag {
         background: #fff;
         border: 1px solid #fcd34d;
@@ -69,7 +53,6 @@
         color: #d97706;
         font-weight: 600;
       }
-
       .clean-table th {
         background: transparent;
         color: #64748b;
@@ -90,88 +73,53 @@
         transition: background 0.2s;
       }
 
-      #reader button {
-        background-color: #0f172a !important;
-        color: white !important;
-        border-radius: 8px !important;
-        padding: 8px 16px !important;
-        border: none !important;
-        font-weight: bold !important;
-        cursor: pointer;
-        margin: 5px;
+      /* Mobile Bottom Nav Active State */
+      .nav-mobile-active {
+        color: #10b981 !important;
       }
-      #reader select {
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        margin: 5px;
-        outline: none;
-      }
-      #reader a {
-        color: #3b82f6 !important;
-        font-weight: bold;
-        text-decoration: none;
+      .nav-mobile-active svg {
+        transform: translateY(-3px);
+        transition: all 0.3s;
       }
 
       .toast-show {
         transform: translateX(0) !important;
         opacity: 1 !important;
       }
+
+      /* Scanner UI */
+      #reader {
+        border: none !important;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #000;
+      }
+      #reader video {
+        object-fit: cover;
+        border-radius: 16px;
+      }
+      #reader__dashboard_section_csr button {
+        background: #10b981 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        border: none !important;
+        font-weight: bold !important;
+        cursor: pointer;
+        margin-top: 10px;
+      }
     </style>
   </head>
-  <body class="flex h-screen overflow-hidden">
+  <body class="flex h-screen overflow-hidden bg-slate-50 md:flex-row flex-col">
     <div
       id="toastAlert"
-      class="fixed top-6 right-6 z-[100] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform translate-x-full opacity-0 bg-slate-800 text-white"
+      class="fixed top-6 right-6 z-[100] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform translate-x-full opacity-0 text-white"
     >
-      <span class="font-medium text-sm" id="toastMsg"
-        >✅ សារជូនដំណឹងនៅទីនេះ!</span
-      >
-    </div>
-
-    <div
-      id="customConfirmModal"
-      class="fixed inset-0 z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
-    >
-      <div
-        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
-        onclick="closeConfirm()"
-      ></div>
-      <div
-        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform duration-300"
-        id="confirmBox"
-      >
-        <div
-          id="confirmIcon"
-          class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-slate-100 text-slate-600"
-        >
-          🚪
-        </div>
-        <h3 class="text-xl font-bold text-center text-slate-800 mb-2">
-          ចាកចេញពីគណនី
-        </h3>
-        <p class="text-center text-slate-500 text-sm font-medium mb-6">
-          តើអ្នកពិតជាចង់ចាកចេញមែនទេ?
-        </p>
-        <div class="flex justify-center gap-3">
-          <button
-            onclick="closeConfirm()"
-            class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 w-full transition"
-          >
-            បោះបង់
-          </button>
-          <button
-            id="confirmBtnLogout"
-            class="px-5 py-2.5 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-slate-800 hover:bg-slate-900"
-          >
-            យល់ព្រម
-          </button>
-        </div>
-      </div>
+      <span class="font-medium text-sm" id="toastMsg"></span>
     </div>
 
     <aside
-      class="w-[260px] bg-[#0B1120] text-slate-400 flex flex-col z-20 no-print"
+      class="hidden md:flex w-[260px] bg-[#0B1120] text-slate-400 flex-col z-20 shadow-xl"
     >
       <div
         class="h-20 flex flex-col justify-center px-8 border-b border-slate-800/50"
@@ -275,38 +223,10 @@
             </button>
           </div>
         </div>
-        <div>
-          <p
-            class="px-4 text-[11px] font-bold tracking-[0.2em] text-slate-500 uppercase mb-3"
-          >
-            Support
-          </p>
-          <div class="space-y-1">
-            <button
-              onclick="showSupportInfo()"
-              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/5"
-            >
-              <svg
-                class="w-5 h-5 opacity-70"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                ></path>
-              </svg>
-              ទំនាក់ទំនង
-            </button>
-          </div>
-        </div>
       </div>
       <div class="p-4 border-t border-slate-800/50">
         <button
-          onclick="triggerConfirm('logout')"
+          onclick="logout()"
           class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition duration-300 font-bold text-sm shadow-md"
         >
           <svg
@@ -327,16 +247,21 @@
       </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    <main
+      class="flex-1 flex flex-col h-full overflow-y-auto pb-20 md:pb-0 relative"
+    >
       <header
-        class="h-20 bg-white px-8 flex justify-between items-center sticky top-0 z-10 shadow-sm border-b border-slate-100 no-print"
+        class="h-16 md:h-20 bg-white/80 backdrop-blur-md px-6 md:px-8 flex justify-between items-center sticky top-0 z-10 shadow-sm border-b border-slate-100"
       >
-        <h2 class="text-[22px] font-bold text-slate-800" id="headerTitle">
+        <h2
+          class="text-xl md:text-[22px] font-bold text-slate-800"
+          id="headerTitle"
+        >
           ផ្ទាំងស្វាគមន៍
         </h2>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 md:gap-4">
           <span
-            class="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-xs border border-emerald-100 font-bold"
+            class="hidden md:flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-xs border border-emerald-100 font-bold"
             ><span class="relative flex h-2 w-2"
               ><span
                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
@@ -345,43 +270,54 @@
                 class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"
               ></span
             ></span>
-            Tenant Portal</span
+            Tenant</span
           >
-          <div class="flex flex-col text-right">
-            <span class="font-bold text-sm text-slate-800" id="headerName"
-              >---</span
+          <div class="flex flex-col text-right hidden sm:flex">
+            <span class="font-bold text-sm text-slate-800" id="displayUserName"
+              >...</span
             >
-            <span class="text-xs text-slate-500" id="headerPhone">---</span>
+            <span class="text-xs text-slate-500" id="displayUserPhone"
+              >...</span
+            >
           </div>
           <div
-            class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200"
-            id="headerAvatar"
+            class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border border-blue-200"
+            id="displayUserAvatar"
           >
             U
           </div>
         </div>
       </header>
 
-      <div class="p-8">
+      <div class="p-4 md:p-8 w-full max-w-7xl mx-auto">
         <div id="dashboard" class="tab-content active">
-          <div id="dashboardContent">
-            <div class="text-center text-slate-500 italic">
-              កំពុងទាញយកទិន្នន័យ...
-            </div>
+          <div class="mb-6 md:mb-8 text-center md:text-left">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800">
+              សួស្តី, <span id="greetName">...</span> 👋
+            </h1>
+            <p class="text-slate-500 mt-2 font-medium text-sm">
+              នេះជាព័ត៌មាន និងវិក្កយបត្រនៃការស្នាក់នៅរបស់អ្នក។
+            </p>
           </div>
+
+          <div
+            id="ticketsContainer"
+            class="space-y-6 flex flex-col items-center"
+          ></div>
         </div>
 
         <div id="bookroom" class="tab-content max-w-4xl mx-auto">
           <div
-            class="bg-white rounded-[16px] shadow-sm border border-slate-100 p-8"
+            class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8"
           >
             <h2
-              class="text-xl font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3"
+              class="text-lg md:text-xl font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3"
             >
               ទម្រង់ស្នើសុំកក់បន្ទប់
             </h2>
             <form
-              onsubmit="handleUserBook(event)"
+              id="bookingForm"
+              onsubmit="submitBooking(event)"
               class="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <div class="md:col-span-2">
@@ -394,13 +330,10 @@
                   id="roomSelect"
                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition"
                   required
-                  onchange="
-                    fetchBookedSlots();
-                    validateLiveDates();
-                  "
+                  onchange="fetchBookedSlots()"
                 >
                   <option value="" disabled selected>
-                    -- ជ្រើសរើសបន្ទប់ --
+                    -- កំពុងទាញយកទិន្នន័យបន្ទប់ --
                   </option>
                 </select>
                 <div
@@ -408,7 +341,7 @@
                   class="mt-3 hidden bg-amber-50 border border-amber-200 p-3 rounded-lg shadow-sm"
                 >
                   <h4 class="text-xs font-bold text-amber-700 mb-2">
-                    ⚠️ ម៉ោងដែលមានគេកក់រួចហើយ (មិនអាចរើសជាន់គ្នាបានទេ):
+                    ⚠️ ម៉ោងដែលមានគេកក់រួចហើយ:
                   </h4>
                   <div id="slotsContainer"></div>
                 </div>
@@ -420,7 +353,6 @@
                 >
                 <input
                   type="datetime-local"
-                  name="check_in_time"
                   id="checkInInput"
                   onchange="validateLiveDates()"
                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
@@ -434,7 +366,6 @@
                 >
                 <input
                   type="datetime-local"
-                  name="check_out_time"
                   id="checkOutInput"
                   onchange="validateLiveDates()"
                   class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
@@ -448,7 +379,6 @@
                   >របៀបបង់ប្រាក់ (Payment Method)</label
                 >
                 <select
-                  name="payment_method"
                   id="paymentMethod"
                   class="w-full bg-white border border-blue-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500"
                   required
@@ -471,18 +401,18 @@
 
               <div
                 id="liveErrorBanner"
-                class="live-error-banner md:col-span-2 text-center shadow-sm"
+                class="hidden md:col-span-2 text-center bg-red-50 text-red-600 border border-red-200 p-3 rounded-lg font-bold text-sm shadow-sm"
               >
-                ❌ ម៉ោងនេះមានគេកក់រួចហើយ! សូមប្តូរម៉ោងថ្មីដើម្បីបន្តការកក់។
+                ❌ ម៉ោងនេះមានគេកក់រួចហើយ! សូមប្តូរម៉ោងថ្មី។
               </div>
 
               <div class="md:col-span-2 mt-2">
                 <button
                   type="submit"
                   id="submitBookBtn"
-                  class="w-full bg-[#0B1120] text-white font-bold py-4 rounded-xl hover:bg-blue-600 shadow-lg transition text-base"
+                  class="w-full bg-[#0B1120] text-white font-bold py-4 rounded-xl hover:bg-blue-600 shadow-lg transition text-base flex items-center justify-center gap-2"
                 >
-                  បញ្ជូនសំណើកក់
+                  <span>បញ្ជូនសំណើកក់</span>
                 </button>
               </div>
             </form>
@@ -491,56 +421,77 @@
 
         <div id="floorplan" class="tab-content">
           <div
-            class="bg-white rounded-[16px] shadow-sm border border-slate-100 p-8"
+            class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8"
           >
-            <h2
-              class="text-xl font-bold text-slate-800 mb-6 border-l-4 border-slate-500 pl-3"
+            <div class="flex justify-between items-center mb-6">
+              <h2
+                class="text-lg md:text-xl font-bold text-slate-800 border-l-4 border-slate-500 pl-3"
+              >
+                Live Floor Plan
+              </h2>
+              <button
+                onclick="loadRooms()"
+                class="p-2 bg-slate-100 rounded-lg text-slate-600 hover:bg-slate-200 transition"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div
+              class="flex flex-wrap gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600"
             >
-              Live Floor Plan
-            </h2>
-            <p
-              class="text-sm text-slate-500 mb-6 bg-slate-50 p-4 rounded-lg border border-slate-200"
-            >
-              🟩 ចុចលើបន្ទប់
-              <strong class="text-emerald-600">ពណ៌បៃតង</strong>
-              វានឹងនាំអ្នកទៅទំព័រកក់ និងជ្រើសរើសបន្ទប់នោះដោយស្វ័យប្រវត្តិ。<br />
-              🟥 បន្ទប់
-              <strong class="text-red-500">ពណ៌ក្រហម</strong> គឺមានភ្ញៀវកក់រួចហើយ
-              (មិនអាចមើលព័ត៌មាន ឬកក់បានទេ)។
-            </p>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                ទំនេរ (អាចកក់បាន)
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                មានភ្ញៀវស្នាក់នៅ (Occupied)
+              </div>
+            </div>
+
             <div
               id="floorplanGrid"
-              class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6"
             ></div>
           </div>
         </div>
 
         <div id="history" class="tab-content">
           <div
-            class="bg-white rounded-[16px] shadow-sm border border-slate-100 overflow-hidden"
+            class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
           >
             <div
-              class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4"
+              class="p-4 md:p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4"
             >
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="w-1 h-6 bg-blue-600 rounded"></div>
-                <h2 class="text-lg font-bold text-slate-800">
-                  ប្រវត្តិការជួលរបស់អ្នក
-                </h2>
+                <h2 class="text-lg font-bold text-slate-800">ប្រវត្តិការជួល</h2>
               </div>
-              <div class="flex gap-2">
+              <div class="flex gap-2 w-full md:w-auto">
                 <button
                   onclick="openScanner()"
-                  class="bg-[#0B1120] text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-slate-800 transition shadow-sm"
+                  class="bg-[#10B981] flex-1 md:flex-none justify-center text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-500/30 transition transform hover:-translate-y-0.5"
                 >
-                  📷 Scan
+                  📷 Scan QR
                 </button>
                 <input
                   type="text"
                   id="searchInput"
                   onkeyup="searchTable()"
                   placeholder="ស្វែងរក..."
-                  class="bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 w-64 outline-none text-sm focus:border-blue-500 transition"
+                  class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 w-full md:w-64 outline-none text-sm focus:border-blue-500 transition"
                 />
               </div>
             </div>
@@ -549,15 +500,15 @@
               <table class="w-full clean-table text-left" id="historyTable">
                 <thead>
                   <tr>
-                    <th class="px-6 pt-5">Ref & Room</th>
-                    <th class="px-6 pt-5">Schedule</th>
-                    <th class="px-6 pt-5">Payment</th>
-                    <th class="px-6 pt-5">Status</th>
-                    <th class="px-6 pt-5 text-right">Actions</th>
+                    <th class="px-6 pt-5 min-w-[120px]">Room</th>
+                    <th class="px-6 pt-5 min-w-[150px]">Schedule</th>
+                    <th class="px-6 pt-5 min-w-[100px]">Payment</th>
+                    <th class="px-6 pt-5 min-w-[100px]">Status</th>
+                    <th class="px-6 pt-5 text-right min-w-[80px]">Action</th>
                   </tr>
                 </thead>
                 <tbody
-                  id="historyTbody"
+                  id="historyTableBody"
                   class="text-sm divide-y divide-slate-100"
                 ></tbody>
               </table>
@@ -568,494 +519,626 @@
     </main>
 
     <div
-      id="supportModal"
-      class="fixed inset-0 z-[80] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+      class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_15px_rgba(0,0,0,0.05)]"
     >
-      <div
-        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
-        onclick="closeSupportInfo()"
-      ></div>
-      <div
-        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform"
-        id="supportBox"
+      <button
+        onclick="switchTab('dashboard')"
+        id="mob-dashboard"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 nav-mobile-active transition-colors"
       >
-        <div
-          class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-black"
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          📞
-        </div>
-        <h3 class="text-xl font-bold text-center text-slate-800 mb-6">
-          ទំនាក់ទំនងយើងខ្ញុំ
-        </h3>
-        <div
-          class="space-y-3 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100"
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">ទំព័រដើម</span>
+      </button>
+      <button
+        onclick="switchTab('bookroom')"
+        id="mob-bookroom"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <div class="flex flex-col border-b pb-2">
-            <span class="text-xs text-slate-400">Email:</span
-            ><span class="text-slate-800 font-bold">support@urental.com</span>
-          </div>
-          <div class="flex flex-col">
-            <span class="text-xs text-slate-400">Hotline:</span
-            ><span class="text-blue-600 font-bold text-lg"
-              >+855 12 345 678</span
-            >
-          </div>
-        </div>
-        <button
-          onclick="closeSupportInfo()"
-          class="mt-6 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition"
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">កក់បន្ទប់</span>
+      </button>
+      <button
+        onclick="switchTab('floorplan')"
+        id="mob-floorplan"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          បិទ
-        </button>
-      </div>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">ប្លង់បន្ទប់</span>
+      </button>
+      <button
+        onclick="switchTab('history')"
+        id="mob-history"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">ប្រវត្តិ</span>
+      </button>
     </div>
 
     <div
       id="scannerModal"
-      class="fixed inset-0 z-[60] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+      class="fixed inset-0 z-[110] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
     >
       <div
-        class="bg-slate-900/80 backdrop-blur-sm absolute inset-0"
+        class="bg-slate-900/90 backdrop-blur-md absolute inset-0"
         onclick="closeScanner()"
       ></div>
       <div
-        class="bg-white rounded-2xl p-6 relative z-10 w-[90%] max-w-lg shadow-2xl scale-95 transition-transform"
+        class="bg-white rounded-[24px] p-6 relative z-10 w-[95%] max-w-md shadow-2xl scale-95 transition-transform duration-400"
         id="scannerBox"
       >
-        <h3
-          class="text-sm font-bold text-slate-800 mb-4 flex justify-between items-center border-b pb-3"
-        >
-          <span class="flex items-center gap-2">📷 Smart Scanner</span>
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h3 class="text-lg font-black text-slate-800">Smart QR Scanner</h3>
+            <p class="text-[11px] text-slate-500 font-medium mt-1">
+              Scan Ticket to view booking details
+            </p>
+          </div>
           <button
             onclick="closeScanner()"
-            class="bg-slate-100 rounded-full w-8 h-8 font-bold text-slate-500 hover:text-red-500 transition"
+            class="bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 transition"
           >
-            X
+            ✕
           </button>
-        </h3>
-        <p class="text-[11px] text-slate-500 mb-4 text-center font-medium">
-          Use Camera or choose
-          <strong class="text-blue-600">"Scan an Image File"</strong
-          >.<br />Format: BK-ID-ROOM
-        </p>
+        </div>
+
         <div
-          id="reader"
-          class="rounded-xl overflow-hidden border-2 border-slate-200 shadow-inner bg-slate-50 pb-2"
-        ></div>
+          class="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-4 border-slate-100 shadow-inner"
+        >
+          <div id="reader" class="absolute inset-0 w-full h-full"></div>
+          <div
+            class="absolute inset-0 pointer-events-none border-2 border-[#10B981]/50 rounded-xl z-10 m-4"
+          >
+            <div
+              class="w-full h-1 bg-[#10B981] shadow-[0_0_15px_#10B981] absolute top-0 left-0 animate-[scan_2s_ease-in-out_infinite]"
+            ></div>
+          </div>
+        </div>
+        <style>
+          @keyframes scan {
+            0%,
+            100% {
+              top: 0%;
+            }
+            50% {
+              top: 100%;
+            }
+          }
+        </style>
       </div>
     </div>
 
     <div
       id="boardingPassModal"
-      class="fixed inset-0 z-[70] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+      class="fixed inset-0 z-[120] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4"
     >
       <div
-        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        class="bg-slate-900/80 backdrop-blur-sm absolute inset-0"
         onclick="closeBoardingPass()"
       ></div>
       <div
-        class="relative z-10 scale-95 transition-transform duration-300 transform"
+        class="relative z-10 scale-95 transition-transform duration-400 transform w-full max-w-[800px]"
         id="bpBox"
       >
-        <div
-          id="printableBoardingPass"
-          class="bg-white rounded-[16px] overflow-hidden flex w-full max-w-[850px] shadow-2xl border border-slate-200 relative mx-auto"
-        >
-          <div
-            class="flex-[2.8] relative bg-white border-r-2 border-dashed border-slate-300 z-10"
-          >
-            <div
-              class="bg-[#E11D48] text-white px-8 py-4 flex justify-between items-center"
-            >
-              <h1
-                class="text-xl tracking-widest font-bold flex items-center gap-2"
-              >
-                BOOKING TICKET
-              </h1>
-              <span
-                class="text-[11px] font-bold tracking-widest bg-white/20 px-3 py-1 rounded-full"
-                >U-RENTAL</span
-              >
-            </div>
-            <div class="p-8 relative">
-              <svg
-                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-45 opacity-5 w-64 h-64 pointer-events-none z-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-                ></path>
-              </svg>
+        <div id="bpContentContainer"></div>
 
-              <div class="flex justify-between mb-6 relative z-10">
-                <div>
-                  <div
-                    class="text-[10px] text-slate-400 font-bold tracking-widest"
-                  >
-                    NAME OF GUEST
-                  </div>
-                  <div
-                    id="bp_name"
-                    class="text-lg font-black text-slate-900 uppercase"
-                  >
-                    ---
-                  </div>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="text-[10px] text-slate-400 font-bold tracking-widest"
-                  >
-                    PHONE NUMBER
-                  </div>
-                  <div id="bp_phone" class="text-base font-bold text-slate-900">
-                    ---
-                  </div>
-                </div>
-              </div>
-              <div class="flex justify-between relative z-10">
-                <div>
-                  <div
-                    class="text-[10px] text-slate-400 font-bold tracking-widest"
-                  >
-                    ROOM NO.
-                  </div>
-                  <div
-                    id="bp_room"
-                    class="text-[40px] font-black text-[#E11D48] leading-none mt-1"
-                  >
-                    ---
-                  </div>
-                  <div
-                    id="bp_type"
-                    class="text-[11px] font-bold text-slate-500 mt-2 bg-slate-100 inline-block px-2 py-1 rounded"
-                  >
-                    ---
-                  </div>
-                </div>
-                <div class="text-right">
-                  <div
-                    class="text-[10px] text-slate-400 font-bold tracking-widest"
-                  >
-                    CHECK-IN
-                  </div>
-                  <div id="bp_in" class="text-[15px] font-bold text-slate-900">
-                    ---
-                  </div>
-                  <div
-                    class="text-[10px] text-slate-400 font-bold tracking-widest mt-3"
-                  >
-                    CHECK-OUT
-                  </div>
-                  <div id="bp_out" class="text-[15px] font-bold text-slate-900">
-                    ---
-                  </div>
-                </div>
-              </div>
-              <div
-                class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center relative z-10"
-              >
-                <svg id="bp_barcode"></svg>
-                <div class="text-[10px] text-slate-400 font-bold">
-                  Powered by U-Rental
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex-[1.2] relative bg-slate-50 z-10">
-            <div class="bg-[#BE123C] text-white px-6 py-4 text-center">
-              <h1 class="text-base font-bold tracking-widest">TICKET</h1>
-            </div>
-            <div class="p-6 text-center">
-              <div class="text-[10px] text-slate-400 font-bold tracking-widest">
-                BOARDING ROOM
-              </div>
-              <div
-                id="bp_room_small"
-                class="text-[32px] font-black text-slate-900 mt-1"
-              >
-                ---
-              </div>
-              <div
-                class="bg-white inline-block p-2 border-2 border-slate-200 rounded-xl mt-6 shadow-sm"
-              >
-                <img id="bp_qr" src="" alt="QR" width="120" />
-              </div>
-              <div
-                class="text-[9px] text-slate-400 font-bold mt-2 tracking-widest text-emerald-600"
-              >
-                SHOW AT COUNTER
-              </div>
-            </div>
-          </div>
-          <div
-            class="absolute top-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] border border-slate-200 rounded-full transform -translate-x-1/2 z-20 shadow-inner"
-          ></div>
-          <div
-            class="absolute bottom-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] border border-slate-200 rounded-full transform -translate-x-1/2 z-20 shadow-inner"
-          ></div>
-        </div>
-
-        <div class="flex justify-center gap-3 mt-6 relative z-10 no-print">
-          <button
-            onclick="window.print()"
-            class="bg-white text-slate-800 text-sm font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-slate-50 transition transform hover:-translate-y-1"
-          >
-            🖨️ Print Pass
-          </button>
+        <div class="flex justify-center gap-4 mt-8 relative z-10">
           <button
             onclick="closeBoardingPass()"
-            class="bg-slate-800 text-white text-sm font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-slate-900 transition transform hover:-translate-y-1"
+            class="bg-white text-slate-800 text-sm font-bold px-10 py-3.5 rounded-xl shadow-xl hover:bg-slate-100 transition transform hover:-translate-y-1"
           >
-            Close
+            បិទផ្ទាំង (Close)
           </button>
         </div>
       </div>
     </div>
 
     <script>
-      // ==========================================
-      // API Fetch Logic (ទាញទិន្នន័យពិតពី DB សម្រាប់ Tenant)
-      // ==========================================
+      // --- 1. User State & Setup ---
+      const userId = localStorage.getItem("user_id");
+      const userPhone = localStorage.getItem("user_phone");
+      const userName = localStorage.getItem("user_name");
 
-      async function fetchTenantData() {
-        const userId = localStorage.getItem("user_id") || "null";
-        const userPhone = localStorage.getItem("user_phone") || "null";
-        const userName = localStorage.getItem("user_name") || "Guest";
+      if (!userId || !userPhone) {
+        window.location.href = "/index.html";
+      }
 
-        // ១. អាប់ដេតព័ត៌មានភ្ញៀវនៅផ្នែក Header
-        document.getElementById("headerName").innerText = userName;
-        document.getElementById("headerPhone").innerText = userPhone;
-        document.getElementById("headerAvatar").innerText = userName
-          .charAt(0)
-          .toUpperCase();
+      document.getElementById("displayUserName").innerText = userName;
+      document.getElementById("displayUserPhone").innerText = userPhone;
+      document.getElementById("greetName").innerText = userName;
+      document.getElementById("displayUserAvatar").innerText = userName
+        .charAt(0)
+        .toUpperCase();
 
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/index.html";
+      }
+
+      // --- 2. UI & Tab Management ---
+      function switchTab(tabId) {
+        // Update Desktop Nav
+        const btns = ["dashboard", "bookroom", "floorplan", "history"];
+        btns.forEach((id) => {
+          let btn = document.getElementById("nav-" + id);
+          if (btn) {
+            if (id === tabId) btn.classList.add("bg-white/10", "text-white");
+            else btn.classList.remove("bg-white/10", "text-white");
+          }
+        });
+
+        // Update Mobile Nav
+        btns.forEach((id) => {
+          let mBtn = document.getElementById("mob-" + id);
+          if (mBtn) {
+            if (id === tabId) mBtn.classList.add("nav-mobile-active");
+            else mBtn.classList.remove("nav-mobile-active");
+          }
+        });
+
+        // Update Content
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
+
+        const titles = {
+          dashboard: "ផ្ទាំងស្វាគមន៍",
+          bookroom: "ស្នើសុំកក់បន្ទប់",
+          floorplan: "ពិនិត្យប្លង់បន្ទប់",
+          history: "ប្រវត្តិការជួល",
+        };
+        document.getElementById("headerTitle").innerText = titles[tabId];
+
+        // Refresh Data based on Tab
+        if (tabId === "dashboard" || tabId === "history") loadMyBookings();
+        if (tabId === "floorplan" || tabId === "bookroom") loadRooms();
+      }
+
+      function showToast(message, type = "error") {
+        let t = document.getElementById("toastAlert");
+        let m = document.getElementById("toastMsg");
+        m.innerText = message;
+        t.className = `fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform text-white ${type === "error" ? "bg-red-600" : "bg-[#10B981]"}`;
+        t.classList.add("toast-show");
+        setTimeout(() => {
+          t.classList.remove("toast-show");
+        }, 3500);
+      }
+
+      // --- 3. Data Fetching (MongoDB API) ---
+      let allRooms = [];
+      let activeBookingsData = [];
+
+      async function loadRooms() {
         try {
-          // ២. ទាញយកបន្ទប់ និងប្រវត្តិការកក់របស់ភ្ញៀវ
-          let [resRooms, resBookings] = await Promise.all([
-            fetch("/api/rooms/available"),
-            fetch(`/api/bookings/my/${userId}/${userPhone}`),
-          ]);
-          let rooms = await resRooms.json();
-          let bookings = await resBookings.json();
-
-          // ៣. រៀបចំទិន្នន័យសម្រាប់ Dashboard (កាតស្នាក់នៅ)
-          const activeBooking = bookings.find(
-            (b) =>
-              b.status === "booked" ||
-              b.status === "pending" ||
-              b.status === "checked_in",
-          );
-
-          let dashHtml = `
-            <div class="mb-8 text-center md:text-left">
-              <h1 class="text-3xl font-extrabold text-slate-800">សួស្តី, ${userName} 👋</h1>
-              <p class="text-slate-500 mt-2 font-medium text-sm">នេះជាព័ត៌មាន និងវិក្កយបត្រនៃការស្នាក់នៅរបស់អ្នក។</p>
-            </div>
-          `;
-
-          if (activeBooking && activeBooking.room_id) {
-            let isCheckedIn = activeBooking.status === "checked_in";
-            let bgColor = isCheckedIn ? "bg-[#3B82F6]" : "bg-[#E11D48]";
-            let statusText = isCheckedIn ? "ACTIVE" : "PENDING";
-            let textColor = isCheckedIn ? "text-[#3B82F6]" : "text-[#E11D48]";
-            let refCode = `BK-${activeBooking._id.substring(activeBooking._id.length - 6).toUpperCase()}-${activeBooking.room_id.room_number}`;
-
-            let checkInStr = new Date(
-              activeBooking.check_in_time,
-            ).toLocaleString("en-GB", {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            let checkOutStr = new Date(
-              activeBooking.check_out_time,
-            ).toLocaleString("en-GB", {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-
-            dashHtml += `
-              <div id="printableBoardingPass" class="bg-white rounded-[16px] overflow-hidden flex w-full max-w-[850px] shadow-xl border border-slate-200 relative mx-auto mt-6">
-                <div class="flex-[2.8] relative bg-white border-r-2 border-dashed border-slate-300 z-10">
-                  <div class="${bgColor} text-white px-8 py-4 flex justify-between items-center">
-                    <h1 class="text-xl tracking-widest font-bold flex items-center gap-2">BOOKING TICKET</h1>
-                    <span class="text-[11px] font-bold tracking-widest bg-white/20 px-3 py-1 rounded-full">${statusText}</span>
-                  </div>
-                  <div class="p-8 relative">
-                    <svg class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-45 opacity-5 w-64 h-64 pointer-events-none z-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-                    </svg>
-                    <div class="flex justify-between mb-6 relative z-10">
-                      <div><div class="text-[10px] text-slate-400 font-bold tracking-widest">NAME OF GUEST</div><div class="text-lg font-black text-slate-900 uppercase">${activeBooking.tenant_name}</div></div>
-                      <div class="text-right"><div class="text-[10px] text-slate-400 font-bold tracking-widest">PHONE NUMBER</div><div class="text-base font-bold text-slate-900">${activeBooking.tenant_phone}</div></div>
-                    </div>
-                    <div class="flex justify-between relative z-10">
-                      <div><div class="text-[10px] text-slate-400 font-bold tracking-widest">ROOM NO.</div><div class="text-[40px] font-black ${textColor} leading-none mt-1">${activeBooking.room_id.room_number}</div><div class="text-[11px] font-bold text-slate-500 mt-2 bg-slate-100 inline-block px-2 py-1 rounded">${activeBooking.room_id.type_id ? activeBooking.room_id.type_id.type_name : "N/A"}</div></div>
-                      <div class="text-right">
-                        <div class="text-[10px] text-slate-400 font-bold tracking-widest">CHECK-IN</div><div class="text-[15px] font-bold text-slate-900">${checkInStr}</div>
-                        <div class="text-[10px] text-slate-400 font-bold tracking-widest mt-3">CHECK-OUT</div><div class="text-[15px] font-bold text-slate-900">${checkOutStr}</div>
-                      </div>
-                    </div>
-                    <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center relative z-10">
-                      <svg id="dash_barcode"></svg>
-                      <div class="text-[10px] text-slate-400 font-bold">Powered by U-Rental</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex-[1.2] relative bg-slate-50 z-10">
-                  <div class="bg-[#BE123C] text-white px-6 py-4 text-center"><h1 class="text-base font-bold tracking-widest">TICKET</h1></div>
-                  <div class="p-6 text-center">
-                    <div class="text-[10px] text-slate-400 font-bold tracking-widest">BOARDING ROOM</div>
-                    <div class="text-[32px] font-black text-slate-900 mt-1">${activeBooking.room_id.room_number}</div>
-                    <div class="bg-white inline-block p-2 border-2 border-slate-200 rounded-xl mt-6 shadow-sm"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(refCode)}" alt="QR" width="120"></div>
-                    <div class="text-[9px] text-slate-400 font-bold mt-2 tracking-widest text-emerald-600">SHOW AT COUNTER</div>
-                  </div>
-                </div>
-                <div class="absolute top-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] rounded-full transform -translate-x-1/2 z-20 shadow-inner"></div>
-                <div class="absolute bottom-[60px] left-[70%] w-[34px] h-[34px] bg-[#F8FAFC] rounded-full transform -translate-x-1/2 z-20 shadow-inner"></div>
-              </div>
-            `;
-            // កំណត់ទិន្នន័យដើម្បី Generate Barcode នៅខាងក្រោម
-            window.activeDashCode = refCode;
-          } else {
-            dashHtml += `
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center max-w-3xl mx-auto mt-6">
-                <div class="w-20 h-20 bg-slate-50 border-2 border-dashed border-slate-300 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800 mb-2">អ្នកមិនទាន់មានការកក់សកម្មទេ</h2>
-                <p class="text-slate-500 mb-8 text-sm">សូមពិនិត្យប្លង់បន្ទប់ ឬធ្វើការកក់បន្ទប់ដែលអ្នកពេញចិត្តឥឡូវនេះ ដើម្បីទទួលបានការស្នាក់នៅដ៏ងាយស្រួល។</p>
-                <button onclick="switchTab('floorplan')" class="bg-[#0B1120] text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-slate-800 transition">🔍 មើលប្លង់បន្ទប់</button>
-              </div>
-            `;
-          }
-          document.getElementById("dashboardContent").innerHTML = dashHtml;
-
-          // Render Dash Barcode បើមាន
-          if (activeBooking && activeBooking.room_id) {
-            JsBarcode("#dash_barcode", window.activeDashCode, {
-              format: "CODE128",
-              width: 1.5,
-              height: 35,
-              displayValue: true,
-              fontSize: 11,
-              margin: 0,
-              lineColor: "#0F172A",
-            });
-          }
-
-          // ៤. រៀបចំបញ្ជីបន្ទប់ក្នុង Select
-          let roomSelectHtml = `<option value="" disabled selected>-- ជ្រើសរើសបន្ទប់ --</option>`;
-          rooms.forEach((r) => {
-            roomSelectHtml += `<option value="${r._id}" data-price="${r.price}">បន្ទប់ ${r.room_number} - ${r.type_id ? r.type_id.type_name : ""} ($${r.price})</option>`;
-          });
-          document.getElementById("roomSelect").innerHTML = roomSelectHtml;
-
-          // ៥. រៀបចំ Floorplan សម្រាប់ Tenant (ឃើញតែបន្ទប់ទំនេរ)
-          let floorHtml = "";
-          rooms.forEach((r) => {
-            floorHtml += `
-              <div onclick="gotoBooking('${r._id}')" class="border-2 rounded-2xl p-6 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 shadow-sm hover:shadow-md cursor-pointer transform hover:scale-105 flex flex-col items-center justify-center relative transition">
-                <span class="text-3xl font-black tracking-tight">${r.room_number}</span>
-                <span class="text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${r.type_id ? r.type_id.type_name : ""}</span>
-              </div>
-            `;
-          });
-          // ចំណាំ៖ ដោយសារ API ទាញយកតែ available rooms ដូច្នេះ floorplan របស់ tenant លោតតែអាទំនេរពណ៌បៃតងប៉ុណ្ណោះ។ បើចង់បង្ហាញក្រហមត្រូវហៅ API /rooms ធម្មតា
-          document.getElementById("floorplanGrid").innerHTML = floorHtml;
-
-          // ៦. រៀបចំប្រវត្តិការកក់ (History Table)
-          let historyHtml = "";
-          bookings.forEach((b) => {
-            let refCode = `BK-${b._id.substring(b._id.length - 6).toUpperCase()}-${b.room_id ? b.room_id.room_number : "N/A"}`;
-            let inStr = new Date(b.check_in_time).toLocaleString("en-GB", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            let outStr = new Date(b.check_out_time).toLocaleString("en-GB", {
-              month: "2-digit",
-              day: "2-digit",
-              year: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-
-            let payBadge =
-              b.payment_status === "paid"
-                ? `<span class="text-emerald-600 text-[12px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Paid</span>`
-                : `<span class="text-red-500 text-[12px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg> Unpaid</span>
-                 ${b.payment_method === "online" ? `<a href="payment.html?id=${b._id}" class="text-[10px] text-blue-600 font-bold hover:text-blue-800 hover:underline inline-block mt-1 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded transition">🔄 Pay Now</a>` : ""}`;
-
-            let statusBadge = "";
-            if (b.status === "checked_in") {
-              statusBadge =
-                '<span class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase">Active</span>';
-            } else if (
-              b.status === "pending" ||
-              (b.payment_method === "online" &&
-                b.payment_status === "unpaid" &&
-                b.status !== "checked_out")
-            ) {
-              statusBadge =
-                '<span class="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase">Failed / Pending</span>';
-            } else if (b.status === "booked") {
-              statusBadge =
-                '<span class="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase">Booked</span>';
-            } else {
-              statusBadge =
-                '<span class="bg-slate-50 text-slate-500 px-2.5 py-1 rounded-md text-[11px] font-bold uppercase">Finished</span>';
-            }
-
-            historyHtml += `
-              <tr class="hover:bg-slate-50 transition">
-                <td class="px-6">
-                  <div class="font-black text-slate-800 text-base">Room ${b.room_id ? b.room_id.room_number : "N/A"}</div>
-                  <div class="text-[11px] text-blue-500 mt-1 font-mono font-bold searchable-code">${refCode}</div>
-                </td>
-                <td class="px-6 text-xs font-semibold text-slate-600">
-                  <div class="text-emerald-600 mb-1">IN: ${inStr}</div>
-                  <div class="text-amber-600">OUT: ${outStr}</div>
-                </td>
-                <td class="px-6"><div class="mt-2">${payBadge}</div></td>
-                <td class="px-6"><div>${statusBadge}</div></td>
-                <td class="px-6 text-right">
-                  <button onclick="openBoardingPass('${b.tenant_name}','${b.tenant_phone}','${b.room_id ? b.room_id.room_number : ""}','${b.room_id && b.room_id.type_id ? b.room_id.type_id.type_name : ""}','${inStr}','${outStr}','${b._id}')" class="p-1.5 text-amber-500 bg-amber-50 hover:bg-amber-100 rounded transition shadow-sm" title="View Ticket">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 00-2 2v2a1 1 0 011 1v2a1 1 0 01-1 1v2a2 2 0 002 2h16a2 2 0 002-2v-2a1 1 0 01-1-1v-2a1 1 0 011-1V8a2 2 0 00-2-2H4zm14 2h2v2h-2V8zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm-2-8h-2v10h2V8zm-4 0H8v10h4V8z"></path></svg>
-                  </button>
-                </td>
-              </tr>
-            `;
-          });
-          document.getElementById("historyTbody").innerHTML =
-            historyHtml ||
-            '<tr><td colspan="5" class="p-8 text-center text-slate-500 font-medium">អ្នកមិនទាន់មានប្រវត្តិការជួលនៅឡើយទេ។</td></tr>';
+          let res = await fetch("/api/rooms");
+          allRooms = await res.json();
+          renderFloorPlan();
+          renderRoomDropdown();
         } catch (err) {
-          console.error("Error fetching tenant data:", err);
+          console.error("Error loading rooms", err);
         }
       }
 
-      // ==========================================
-      // API POST: Handle Booking Submission
-      // ==========================================
-      async function handleUserBook(event) {
-        event.preventDefault();
+      async function loadMyBookings() {
+        try {
+          let res = await fetch(`/api/bookings/my/${userId}/${userPhone}`);
+          let bookings = await res.json();
+
+          // Filter active bookings for dashboard tickets (booked or checked_in)
+          let activeBookings = bookings.filter(
+            (b) => b.status === "booked" || b.status === "checked_in",
+          );
+          renderDashboardTickets(activeBookings);
+          renderHistoryTable(bookings);
+        } catch (err) {
+          console.error("Error loading bookings", err);
+        }
+      }
+
+      // --- 4. Render Logic ---
+      function generateTicketHTML(b) {
+        const isCheckedIn = b.status === "checked_in";
+        const bgColor = isCheckedIn ? "bg-[#3B82F6]" : "bg-[#E11D48]";
+        const statusText = isCheckedIn ? "ACTIVE" : "PENDING";
+        const dataCode = `BK-${b._id}-${b.room_id.room_number}`;
+        const roomType = b.room_id.type_id
+          ? b.room_id.type_id.type_name
+          : "Standard";
+        const inTime = new Date(b.check_in_time).toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        const outTime = new Date(b.check_out_time).toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        return `
+            <div class="bg-white rounded-[16px] overflow-hidden flex flex-col md:flex-row w-full shadow-xl border border-slate-200 relative mb-6 transform hover:scale-[1.01] transition duration-300">
+                <div class="flex-[2.8] relative bg-white border-b-2 md:border-b-0 md:border-r-2 border-dashed border-slate-300 z-10">
+                    <div class="${bgColor} text-white px-6 md:px-8 py-3 md:py-4 flex justify-between items-center">
+                        <h1 class="text-base md:text-xl tracking-widest font-bold flex items-center gap-2">BOOKING TICKET</h1>
+                        <span class="text-[10px] md:text-[11px] font-bold tracking-widest bg-white/20 px-3 py-1 rounded-full">${statusText}</span>
+                    </div>
+                    <div class="p-6 md:p-8 relative">
+                        <svg class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-45 opacity-5 w-48 md:w-64 h-48 md:h-64 pointer-events-none z-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                        
+                        <div class="flex justify-between mb-6 relative z-10">
+                            <div><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">NAME OF GUEST</div><div class="text-base md:text-lg font-black text-slate-900 uppercase">${b.tenant_name}</div></div>
+                            <div class="text-right"><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">PHONE NUMBER</div><div class="text-sm md:text-base font-bold text-slate-900">${b.tenant_phone}</div></div>
+                        </div>
+                        <div class="flex justify-between relative z-10">
+                            <div><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">ROOM NO.</div><div class="text-[32px] md:text-[40px] font-black ${isCheckedIn ? "text-[#3B82F6]" : "text-[#E11D48]"} leading-none mt-1">${b.room_id.room_number}</div><div class="text-[10px] md:text-[11px] font-bold text-slate-500 mt-2 bg-slate-100 inline-block px-2 py-1 rounded">${roomType}</div></div>
+                            <div class="text-right">
+                                <div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">CHECK-IN</div><div class="text-sm md:text-[15px] font-bold text-slate-900">${inTime}</div>
+                                <div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest mt-3">CHECK-OUT</div><div class="text-sm md:text-[15px] font-bold text-slate-900">${outTime}</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center relative z-10">
+                            <svg class="barcode-target" data-value="${dataCode}"></svg>
+                            <div class="text-[9px] md:text-[10px] text-slate-400 font-bold">Powered by U-Rental</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex-[1.2] relative bg-slate-50 z-10 flex flex-col md:block">
+                    <div class="bg-[#BE123C] text-white px-6 py-3 md:py-4 text-center hidden md:block"><h1 class="text-base font-bold tracking-widest">TICKET</h1></div>
+                    <div class="p-6 text-center flex-1 flex flex-col justify-center items-center">
+                        <div class="text-[10px] text-slate-400 font-bold tracking-widest hidden md:block">BOARDING ROOM</div>
+                        <div class="text-[24px] md:text-[32px] font-black text-slate-900 mt-1 hidden md:block">${b.room_id.room_number}</div>
+                        <div class="bg-white inline-block p-2 border-2 border-slate-200 rounded-xl md:mt-6 shadow-sm"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(dataCode)}" alt="QR" class="w-[100px] md:w-[120px]"></div>
+                        <div class="text-[9px] text-slate-400 font-bold mt-3 tracking-widest text-emerald-600">SHOW AT COUNTER</div>
+                    </div>
+                </div>
+                
+                <div class="hidden md:block absolute top-[55px] left-[70%] w-[34px] h-[34px] bg-slate-50 border border-slate-200 rounded-full transform -translate-x-1/2 z-20"></div>
+                <div class="hidden md:block absolute bottom-[55px] left-[70%] w-[34px] h-[34px] bg-slate-50 border border-slate-200 rounded-full transform -translate-x-1/2 z-20"></div>
+            </div>`;
+      }
+
+      function renderDashboardTickets(activeBookings) {
+        const container = document.getElementById("ticketsContainer");
+        if (activeBookings.length === 0) {
+          container.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 text-center w-full max-w-3xl mx-auto">
+                        <div class="w-20 h-20 bg-slate-50 border-2 border-dashed border-slate-300 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800 mb-2">អ្នកមិនទាន់មានការកក់សកម្មទេ</h2>
+                        <p class="text-slate-500 mb-8 text-sm">សូមពិនិត្យប្លង់បន្ទប់ ឬធ្វើការកក់បន្ទប់ដែលអ្នកពេញចិត្តឥឡូវនេះ ដើម្បីទទួលបានការស្នាក់នៅដ៏ងាយស្រួល។</p>
+                        <button onclick="switchTab('floorplan')" class="bg-[#0B1120] text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:bg-slate-800 transition">🔍 មើលប្លង់បន្ទប់</button>
+                    </div>`;
+        } else {
+          let html = "";
+          activeBookings.forEach((b) => {
+            html += generateTicketHTML(b);
+          });
+          container.innerHTML = html;
+
+          // Initialize Barcodes
+          setTimeout(() => {
+            document.querySelectorAll(".barcode-target").forEach((svg) => {
+              let val = svg.getAttribute("data-value");
+              // Use smaller width for mobile
+              let bw = window.innerWidth < 768 ? 1.2 : 1.5;
+              JsBarcode(svg, val, {
+                format: "CODE128",
+                width: bw,
+                height: 30,
+                displayValue: true,
+                fontSize: 10,
+                margin: 0,
+                lineColor: "#0F172A",
+              });
+            });
+          }, 100);
+        }
+      }
+
+      function renderFloorPlan() {
+        const grid = document.getElementById("floorplanGrid");
+        grid.innerHTML = "";
+
+        // Sort by room number
+        let sortedRooms = [...allRooms].sort((a, b) =>
+          a.room_number.localeCompare(b.room_number),
+        );
+
+        sortedRooms.forEach((r) => {
+          let isOccupied = r.status === "occupied";
+          let bg = isOccupied
+            ? "bg-red-50 border-red-200 text-red-700 shadow-sm opacity-80 cursor-not-allowed"
+            : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 shadow-sm hover:shadow-lg cursor-pointer transform hover:scale-105";
+
+          let onclick = isOccupied
+            ? `showToast('បន្ទប់នេះត្រូវបានកក់រួចហើយ!', 'error')`
+            : `gotoBooking('${r._id}')`;
+          let dot = isOccupied
+            ? '<span class="absolute top-3 right-3 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>'
+            : "";
+          let typeName = r.type_id ? r.type_id.type_name : "N/A";
+
+          grid.innerHTML += `
+                    <div onclick="${onclick}" class="border-2 rounded-2xl p-5 md:p-6 ${bg} flex flex-col items-center justify-center relative transition duration-300">
+                        ${dot}
+                        <span class="text-2xl md:text-3xl font-black tracking-tight">${r.room_number}</span>
+                        <span class="text-[9px] md:text-[10px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${typeName}</span>
+                    </div>`;
+        });
+      }
+
+      function renderRoomDropdown() {
+        const select = document.getElementById("roomSelect");
+        select.innerHTML =
+          '<option value="" disabled selected>-- ជ្រើសរើសបន្ទប់ --</option>';
+
+        let sortedRooms = [...allRooms].sort((a, b) =>
+          a.room_number.localeCompare(b.room_number),
+        );
+        sortedRooms.forEach((r) => {
+          if (r.status === "available") {
+            let typeName = r.type_id ? r.type_id.type_name : "";
+            select.innerHTML += `<option value="${r._id}" data-price="${r.price}">បន្ទប់ ${r.room_number} - ${typeName} ($${r.price})</option>`;
+          }
+        });
+      }
+
+      function renderHistoryTable(bookings) {
+        const tbody = document.getElementById("historyTableBody");
+        tbody.innerHTML = "";
+        if (bookings.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500 font-medium">អ្នកមិនទាន់មានប្រវត្តិការជួលនៅឡើយទេ។</td></tr>`;
+          return;
+        }
+
+        bookings.forEach((row) => {
+          let searchCode = `BK-${row._id}-${row.room_id.room_number}`;
+          let inTime = new Date(row.check_in_time).toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+          let outTime = new Date(row.check_out_time).toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          let payBadge =
+            row.payment_status === "paid"
+              ? `<span class="text-emerald-600 text-[11px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Paid</span>`
+              : `<span class="text-red-500 text-[11px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg> Unpaid</span>`;
+
+          if (
+            row.payment_status === "unpaid" &&
+            row.payment_method === "online"
+          ) {
+            payBadge += `<br><a href="/payment.html?id=${row._id}" class="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-200 px-2 py-1 rounded inline-block mt-1 hover:bg-blue-100">Pay Now</a>`;
+          }
+
+          let statusBadge = "";
+          if (row.status === "checked_in")
+            statusBadge =
+              '<span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase">Active</span>';
+          else if (row.status === "booked")
+            statusBadge =
+              '<span class="bg-amber-50 text-amber-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase">Booked</span>';
+          else if (row.status === "pending")
+            statusBadge =
+              '<span class="bg-red-50 text-red-600 px-2 py-1 rounded-md text-[10px] font-bold uppercase">Failed/Pending</span>';
+          else
+            statusBadge =
+              '<span class="bg-slate-50 text-slate-500 px-2 py-1 rounded-md text-[10px] font-bold uppercase">Finished</span>';
+
+          // We pass full object as string for the modal
+          let bData = encodeURIComponent(JSON.stringify(row));
+
+          tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
+                    <td class="px-6 py-4">
+                        <div class="font-black text-slate-800 text-sm">Room ${row.room_id.room_number}</div>
+                        <div class="text-[10px] text-blue-500 font-mono font-bold mt-1">${searchCode}</div>
+                    </td>
+                    <td class="px-6 py-4 text-[11px] font-semibold text-slate-600">
+                        <div class="text-emerald-600 mb-1">IN: ${inTime}</div>
+                        <div class="text-amber-600">OUT: ${outTime}</div>
+                    </td>
+                    <td class="px-6 py-4">${payBadge}</td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="showTicketModal('${bData}')" class="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition shadow-sm">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 00-2 2v2a1 1 0 011 1v2a1 1 0 01-1 1v2a2 2 0 002 2h16a2 2 0 002-2v-2a1 1 0 01-1-1v-2a1 1 0 011-1V8a2 2 0 00-2-2H4zm14 2h2v2h-2V8zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm-2-8h-2v10h2V8zm-4 0H8v10h4V8z"></path></svg>
+                        </button>
+                    </td>
+                </tr>`;
+        });
+      }
+
+      function searchTable() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        document.querySelectorAll("#historyTableBody tr").forEach((r) => {
+          r.style.display = r.innerText.toLowerCase().includes(input)
+            ? ""
+            : "none";
+        });
+      }
+
+      // --- 5. Booking Logic ---
+      function gotoBooking(roomId) {
+        switchTab("bookroom");
+        document.getElementById("roomSelect").value = roomId;
+        fetchBookedSlots();
+      }
+
+      async function fetchBookedSlots() {
+        let roomId = document.getElementById("roomSelect").value;
+        let box = document.getElementById("liveStatusBox");
+        let container = document.getElementById("slotsContainer");
+        if (!roomId) return;
+
+        try {
+          let res = await fetch(`/api/bookings/check_availability/${roomId}`);
+          activeBookingsData = await res.json();
+
+          container.innerHTML = "";
+          if (activeBookingsData.length > 0) {
+            box.classList.remove("hidden");
+            activeBookingsData.forEach((s) => {
+              let tin = new Date(s.check_in_time).toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+              });
+              let tout = new Date(s.check_out_time).toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+              });
+              container.innerHTML += `<span class="slot-tag">${tin} ➔ ${tout}</span>`;
+            });
+          } else {
+            box.classList.add("hidden");
+          }
+          validateLiveDates();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function validateLiveDates() {
+        let inInput = document.getElementById("checkInInput");
+        let outInput = document.getElementById("checkOutInput");
+        let checkIn = inInput.value;
+        let checkOut = outInput.value;
+        let err = document.getElementById("liveErrorBanner");
         let btn = document.getElementById("submitBookBtn");
+
+        if (checkIn) {
+          outInput.min = checkIn;
+          let inDate = new Date(checkIn);
+          let outDate = new Date(checkOut);
+
+          if (!checkOut || outDate <= inDate) {
+            let nextDay = new Date(inDate.getTime() + 24 * 60 * 60 * 1000);
+            outInput.value = new Date(
+              nextDay.getTime() - nextDay.getTimezoneOffset() * 60000,
+            )
+              .toISOString()
+              .slice(0, 16);
+            checkOut = outInput.value;
+          }
+        }
+
+        if (!checkIn || !checkOut) {
+          err.classList.add("hidden");
+          btn.disabled = false;
+          btn.classList.remove("opacity-50");
+        } else {
+          let isOverlapping = activeBookingsData.some((b) => {
+            let bIn = new Date(b.check_in_time);
+            let bOut = new Date(b.check_out_time);
+            let myIn = new Date(checkIn);
+            let myOut = new Date(checkOut);
+            return myIn < bOut && myOut > bIn;
+          });
+          if (isOverlapping) {
+            err.classList.remove("hidden");
+            btn.disabled = true;
+            btn.classList.add("opacity-50");
+          } else {
+            err.classList.add("hidden");
+            btn.disabled = false;
+            btn.classList.remove("opacity-50");
+          }
+        }
+
+        let roomSelect = document.getElementById("roomSelect");
+        if (roomSelect.value && checkIn && checkOut && !btn.disabled) {
+          let opt = roomSelect.options[roomSelect.selectedIndex];
+          let pricePerDay = parseFloat(opt.getAttribute("data-price"));
+          let hours = Math.abs(new Date(checkOut) - new Date(checkIn)) / 36e5;
+
+          if (hours > 0) {
+            let total = (hours / 24) * pricePerDay;
+            let method = document.getElementById("paymentMethod").value;
+            let note = document.getElementById("paymentNote");
+
+            if (method === "online") {
+              note.innerHTML = `ចំណាំ៖ ប្រព័ន្ធនឹងនាំអ្នកទៅកាន់ <strong>U-Pay Checkout</strong>។ <br><span class="text-blue-600 font-black text-sm block mt-2">💰 តម្លៃ (Total): $${total.toFixed(2)}</span>`;
+            } else {
+              note.innerHTML = `ចំណាំ៖ ការកក់មានស្ថានភាព <strong class="text-red-500">Unpaid</strong>។ <br><span class="text-slate-800 font-black text-sm block mt-2">💰 តម្លៃ (Total): $${total.toFixed(2)}</span>`;
+            }
+          }
+        }
+      }
+
+      async function submitBooking(e) {
+        e.preventDefault();
+        const btn = document.getElementById("submitBookBtn");
         btn.innerHTML = "កំពុងដំណើរការ...";
         btn.disabled = true;
 
-        let payload = {
+        const payload = {
           room_id: document.getElementById("roomSelect").value,
-          user_id: localStorage.getItem("user_id"),
-          tenant_name: localStorage.getItem("user_name") || "Guest",
-          tenant_phone: localStorage.getItem("user_phone") || "000",
+          user_id: userId,
+          tenant_name: userName,
+          tenant_phone: userPhone,
           check_in_time: document.getElementById("checkInInput").value,
           check_out_time: document.getElementById("checkOutInput").value,
           payment_method: document.getElementById("paymentMethod").value,
@@ -1075,246 +1158,27 @@
 
           if (data.success) {
             if (payload.payment_method === "online") {
-              // ភ្ជាប់ទៅ payment ពិតប្រាកដ
-              window.location.href = "payment.html?id=" + data.bookingId;
+              window.location.href = `/payment.html?id=${data.bookingId}`;
             } else {
-              showToast("✅ សំណើកក់បន្ទប់ទទួលបានជោគជ័យ!", "success");
-              event.target.reset();
-              fetchTenantData();
-              switchTab("history");
+              showToast("✅ ការកក់ជោគជ័យ!", "success");
+              document.getElementById("bookingForm").reset();
+              document.getElementById("paymentNote").innerHTML =
+                "សូមជ្រើសរើសបន្ទប់ និងម៉ោងចេញចូលដើម្បីគណនាតម្លៃ។";
+              switchTab("dashboard");
             }
           } else {
             showToast(data.message, "error");
+            btn.innerHTML = "បញ្ជូនសំណើកក់";
+            btn.disabled = false;
           }
         } catch (err) {
-          showToast("បរាជ័យក្នុងការភ្ជាប់ទៅកាន់ Server", "error");
-        } finally {
+          showToast("បរាជ័យក្នុងការភ្ជាប់ Server", "error");
           btn.innerHTML = "បញ្ជូនសំណើកក់";
           btn.disabled = false;
         }
       }
 
-      // ==========================================
-      // Custom Toast logic
-      // ==========================================
-      function showToast(message, type = "error") {
-        let t = document.getElementById("toastAlert");
-        let m = document.getElementById("toastMsg");
-        m.innerText = message;
-        if (type === "error") {
-          t.classList.add("bg-red-600");
-          t.classList.remove("bg-slate-800");
-        } else {
-          t.classList.add("bg-slate-800");
-          t.classList.remove("bg-red-600");
-        }
-        t.classList.add("toast-show");
-        setTimeout(() => {
-          t.classList.remove("toast-show");
-        }, 3000);
-      }
-
-      // Tab Management
-      document.addEventListener("DOMContentLoaded", () => {
-        let activeTab =
-          sessionStorage.getItem("urental_user_tab") || "dashboard";
-        switchTab(activeTab);
-        fetchTenantData(); // Load first time
-        setInterval(fetchTenantData, 5000); // Live sync every 5s
-      });
-
-      function switchTab(tabId) {
-        sessionStorage.setItem("urental_user_tab", tabId);
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((el) => el.classList.remove("active"));
-        document.getElementById(tabId).classList.add("active");
-
-        const btns = ["dashboard", "bookroom", "floorplan", "history"];
-        const titles = {
-          dashboard: "ផ្ទាំងស្វាគមន៍",
-          bookroom: "ស្នើសុំកក់បន្ទប់",
-          floorplan: "ពិនិត្យប្លង់បន្ទប់",
-          history: "ប្រវត្តិការជួល",
-        };
-        btns.forEach((id) => {
-          let btn = document.getElementById("nav-" + id);
-          if (id === tabId) {
-            btn.classList.add("bg-white/10", "text-white");
-            document.getElementById("headerTitle").innerText = titles[id];
-          } else {
-            btn.classList.remove("bg-white/10", "text-white");
-          }
-        });
-      }
-
-      // Floor Plan -> Booking Link
-      function gotoBooking(roomId) {
-        switchTab("bookroom");
-        document.getElementById("roomSelect").value = roomId;
-        fetchBookedSlots();
-      }
-
-      // Custom Confirm
-      function triggerConfirm(actionType) {
-        let title = document.getElementById("confirmTitle");
-        let text = document.getElementById("confirmText");
-        let icon = document.getElementById("confirmIcon");
-        let btn = document.getElementById("confirmBtnLogout");
-
-        btn.onclick = function () {
-          window.location.href = "index.html";
-        };
-
-        document
-          .getElementById("customConfirmModal")
-          .classList.remove("opacity-0", "pointer-events-none");
-        setTimeout(() => {
-          document.getElementById("confirmBox").classList.remove("scale-95");
-        }, 10);
-      }
-
-      function closeConfirm() {
-        document.getElementById("confirmBox").classList.add("scale-95");
-        setTimeout(() => {
-          document
-            .getElementById("customConfirmModal")
-            .classList.add("opacity-0", "pointer-events-none");
-        }, 200);
-      }
-
-      function showSupportInfo() {
-        document
-          .getElementById("supportModal")
-          .classList.remove("opacity-0", "pointer-events-none");
-        setTimeout(() => {
-          document.getElementById("supportBox").classList.remove("scale-95");
-        }, 10);
-      }
-      function closeSupportInfo() {
-        document.getElementById("supportBox").classList.add("scale-95");
-        setTimeout(() => {
-          document
-            .getElementById("supportModal")
-            .classList.add("opacity-0", "pointer-events-none");
-        }, 200);
-      }
-
-      // Live Validation & Auto Set Check-Out
-      let activeBookings = [];
-      async function fetchBookedSlots() {
-        let roomId = document.getElementById("roomSelect").value;
-        let box = document.getElementById("liveStatusBox");
-        let container = document.getElementById("slotsContainer");
-        if (!roomId) return;
-
-        let res = await fetch("/api/bookings/check_availability/" + roomId);
-        let data = await res.json();
-        activeBookings = data;
-
-        container.innerHTML = "";
-        if (data.length > 0) {
-          box.classList.remove("hidden");
-          data.forEach((s) => {
-            let inD = new Date(s.check_in_time).toLocaleString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            let outD = new Date(s.check_out_time).toLocaleString("en-GB", {
-              day: "2-digit",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            container.innerHTML += `<span class="slot-tag">${inD} ➔ ${outD}</span>`;
-          });
-        } else {
-          box.classList.add("hidden");
-        }
-        validateLiveDates();
-      }
-
-      function validateLiveDates() {
-        let checkInInput = document.getElementById("checkInInput");
-        let checkOutInput = document.getElementById("checkOutInput");
-        let checkIn = checkInInput.value;
-        let checkOut = checkOutInput.value;
-        let err = document.getElementById("liveErrorBanner");
-        let btn = document.getElementById("submitBookBtn");
-
-        if (checkIn) {
-          checkOutInput.min = checkIn;
-          let inDate = new Date(checkIn);
-          let outDate = new Date(checkOut);
-
-          if (!checkOut || outDate <= inDate) {
-            let nextDay = new Date(inDate.getTime() + 24 * 60 * 60 * 1000);
-            let tzoffset = new Date().getTimezoneOffset() * 60000;
-            checkOutInput.value = new Date(nextDay - tzoffset)
-              .toISOString()
-              .slice(0, 16);
-            checkOut = checkOutInput.value;
-          }
-        }
-
-        if (!checkIn || !checkOut || activeBookings.length === 0) {
-          err.style.display = "none";
-          btn.disabled = false;
-          btn.classList.remove("opacity-50", "cursor-not-allowed");
-        } else {
-          let inDate = new Date(checkIn);
-          let outDate = new Date(checkOut);
-          let isOverlap = activeBookings.some((b) => {
-            return (
-              inDate < new Date(b.check_out_time) &&
-              outDate > new Date(b.check_in_time)
-            );
-          });
-          if (isOverlap) {
-            err.style.display = "block";
-            btn.disabled = true;
-            btn.classList.add("opacity-50", "cursor-not-allowed");
-          } else {
-            err.style.display = "none";
-            btn.disabled = false;
-            btn.classList.remove("opacity-50", "cursor-not-allowed");
-          }
-        }
-
-        let roomSelect = document.getElementById("roomSelect");
-        if (roomSelect.value && checkIn && checkOut && !btn.disabled) {
-          let selectedOption = roomSelect.options[roomSelect.selectedIndex];
-          let pricePerDay = parseFloat(
-            selectedOption.getAttribute("data-price") || 0,
-          );
-          let hours = Math.abs(new Date(checkOut) - new Date(checkIn)) / 36e5;
-
-          if (hours > 0) {
-            let totalPrice = (hours / 24) * pricePerDay;
-            let method = document.getElementById("paymentMethod").value;
-            let note = document.getElementById("paymentNote");
-
-            if (method === "online") {
-              note.innerHTML = `ចំណាំ៖ ប្រព័ន្ធនឹងនាំអ្នកទៅកាន់ទំព័រ <strong>U-Pay Checkout</strong> ភ្លាមៗដើម្បីទូទាត់ប្រាក់។ <br><span class="text-blue-600 font-black text-sm block mt-2">💰 តម្លៃសរុប (Total): $${totalPrice.toFixed(2)}</span>`;
-            } else {
-              note.innerHTML = `ចំណាំ៖ ការកក់របស់អ្នកនឹងស្ថិតក្នុងស្ថានភាព <strong class="text-red-500">❌ Unpaid</strong>។ សូមបង្ហាញសំបុត្រទៅកាន់ Admin។ <br><span class="text-slate-800 font-black text-sm block mt-2">💰 តម្លៃសរុប (Total): $${totalPrice.toFixed(2)}</span>`;
-            }
-          }
-        }
-      }
-
-      function searchTable() {
-        let input = document.getElementById("searchInput").value.toLowerCase();
-        document.querySelectorAll("#historyTable tbody tr").forEach((r) => {
-          r.style.display = r.innerText.toLowerCase().includes(input)
-            ? ""
-            : "none";
-        });
-      }
-
-      // Scanner
+      // --- 6. Scanner & Global Search ---
       let html5QrcodeScanner;
       function openScanner() {
         document
@@ -1323,21 +1187,48 @@
         setTimeout(() => {
           document.getElementById("scannerBox").classList.remove("scale-95");
         }, 10);
+
+        // Modern QR Scanner
         html5QrcodeScanner = new Html5QrcodeScanner(
           "reader",
-          { fps: 10, qrbox: { width: 250, height: 150 } },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
+          },
           false,
         );
+
         html5QrcodeScanner.render(
-          (t) => {
+          async (text) => {
             closeScanner();
-            switchTab("history");
-            document.getElementById("searchInput").value = t.trim();
-            searchTable();
+            showToast("កំពុងស្វែងរកទិន្នន័យ...", "success");
+
+            // Decode Format: BK-[ID]-[ROOM]
+            let parts = text.trim().split("-");
+            if (parts.length >= 2 && parts[0] === "BK") {
+              let b_id = parts[1];
+              try {
+                // Request Admin Endpoint to find ANY booking
+                let res = await fetch("/api/bookings");
+                let allB = await res.json();
+                let found = allB.find((x) => x._id === b_id);
+                if (found) {
+                  showTicketModal(encodeURIComponent(JSON.stringify(found)));
+                } else {
+                  showToast("រកមិនឃើញសំបុត្រនេះក្នុងប្រព័ន្ធទេ!", "error");
+                }
+              } catch (e) {
+                showToast("Error connecting to server", "error");
+              }
+            } else {
+              showToast("QR Code មិនត្រឹមត្រូវទេ", "error");
+            }
           },
           () => {},
         );
       }
+
       function closeScanner() {
         if (html5QrcodeScanner) html5QrcodeScanner.clear();
         document.getElementById("scannerBox").classList.add("scale-95");
@@ -1345,41 +1236,33 @@
           document
             .getElementById("scannerModal")
             .classList.add("opacity-0", "pointer-events-none");
-        }, 200);
+        }, 300);
       }
 
-      // Boarding Pass Modal
-      function openBoardingPass(
-        name,
-        phone,
-        room,
-        type,
-        checkin,
-        checkout,
-        id,
-      ) {
-        document.getElementById("bp_name").innerText = name;
-        document.getElementById("bp_phone").innerText = phone;
-        document.getElementById("bp_room").innerText = room;
-        document.getElementById("bp_room_small").innerText = room;
-        document.getElementById("bp_type").innerText = type;
-        document.getElementById("bp_in").innerText = checkin;
-        document.getElementById("bp_out").innerText = checkout;
+      // --- 7. Ticket Modal ---
+      function showTicketModal(encodedData) {
+        let b = JSON.parse(decodeURIComponent(encodedData));
+        const container = document.getElementById("bpContentContainer");
+        // Reuse the generation logic
+        container.innerHTML = generateTicketHTML(b);
 
-        let formatCode =
-          "BK-" + id.substring(id.length - 6).toUpperCase() + "-" + room;
-        JsBarcode("#bp_barcode", formatCode, {
-          format: "CODE128",
-          width: 1.5,
-          height: 35,
-          displayValue: true,
-          fontSize: 11,
-          margin: 0,
-          lineColor: "#0F172A",
-        });
-        document.getElementById("bp_qr").src =
-          "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" +
-          encodeURIComponent(formatCode);
+        // Re-render Barcode for modal
+        setTimeout(() => {
+          let svg = container.querySelector(".barcode-target");
+          if (svg) {
+            let val = svg.getAttribute("data-value");
+            let bw = window.innerWidth < 768 ? 1.2 : 1.5;
+            JsBarcode(svg, val, {
+              format: "CODE128",
+              width: bw,
+              height: 35,
+              displayValue: true,
+              fontSize: 11,
+              margin: 0,
+              lineColor: "#0F172A",
+            });
+          }
+        }, 100);
 
         document
           .getElementById("boardingPassModal")
@@ -1388,14 +1271,21 @@
           document.getElementById("bpBox").classList.remove("scale-95");
         }, 10);
       }
+
       function closeBoardingPass() {
         document.getElementById("bpBox").classList.add("scale-95");
         setTimeout(() => {
           document
             .getElementById("boardingPassModal")
             .classList.add("opacity-0", "pointer-events-none");
-        }, 200);
+          document.getElementById("bpContentContainer").innerHTML = ""; // Clear to prevent ID clashing
+        }, 300);
       }
+
+      // Init
+      document.addEventListener("DOMContentLoaded", () => {
+        switchTab("dashboard"); // Default load
+      });
     </script>
   </body>
 </html>
