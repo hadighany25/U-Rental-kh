@@ -1292,15 +1292,28 @@
       let state = { rooms: [], types: [], bookings: [], stats: {} };
 
       // Toast Notification
-      function showToast(message, type = "error") {
+      function showToast(message, type = "success") {
         let t = document.getElementById("toastAlert");
         let m = document.getElementById("toastMsg");
         m.innerText = message;
-        t.className = `fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform text-white ${type === "error" ? "bg-red-600" : "bg-[#10B981]"}`;
-        t.classList.add("toast-show");
+
+        // បន្ថែម translate-x-full opacity-0 ចូលវិញ ដើម្បីឱ្យវាលាក់ខ្លួនពេលអស់ម៉ោង
+        t.className = `cursor-pointer fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform translate-x-full opacity-0 text-white ${type === "error" ? "bg-red-600" : "bg-[#10B981]"}`;
+
+        // បញ្ជាឱ្យលោតបង្ហាញមកក្រៅ
+        setTimeout(() => {
+          t.classList.add("toast-show");
+        }, 10);
+
+        // Auto-hide ក្រោយរយៈពេល ៣.៥ វិនាទី
         setTimeout(() => {
           t.classList.remove("toast-show");
         }, 3500);
+
+        // មុខងារថ្មី៖ អាចយកដៃចុចពីលើ ឬអូសដើម្បីឱ្យវាបាត់ភ្លាមៗបាន
+        t.onclick = function () {
+          this.classList.remove("toast-show");
+        };
       }
 
       // Custom Confirm Dialog
@@ -1513,7 +1526,17 @@
         );
 
         sortedRooms.forEach((r) => {
-          let isOccupied = r.status === "occupied";
+          // ឆែកមើលថាតើបន្ទប់នេះមាននៅក្នុងបញ្ជី Booking ដែរឬទេ (ដែលមិនទាន់ Check-out)
+          let activeBooking = state.bookings.find(
+            (b) =>
+              b.room_id._id === r._id &&
+              (b.status === "booked" ||
+                b.status === "checked_in" ||
+                b.status === "pending"),
+          );
+
+          // បើបន្ទប់ Occupied ស្រាប់ ឬមានគេកក់ហើយ គឺលោតពណ៌ក្រហម
+          let isOccupied = r.status === "occupied" || activeBooking;
           let bg = isOccupied
             ? "bg-red-50 border-red-200 text-red-700"
             : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 cursor-pointer";
