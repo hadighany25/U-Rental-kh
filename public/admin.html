@@ -37,8 +37,12 @@
         transform: translateY(0);
       }
       ::-webkit-scrollbar {
-        width: 0px;
-        height: 0px;
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
       }
 
       .slot-tag {
@@ -69,6 +73,7 @@
         background: #f8fafc;
       }
 
+      /* Mobile Bottom Nav */
       .nav-mobile-active {
         color: #3b82f6 !important;
       }
@@ -76,6 +81,7 @@
         transform: translateY(-3px);
         transition: all 0.3s;
       }
+
       .toast-show {
         transform: translateX(0) !important;
         opacity: 1 !important;
@@ -91,26 +97,60 @@
         object-fit: cover;
         border-radius: 16px;
       }
+      #reader__dashboard_section_csr button {
+        background: #3b82f6 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 8px 16px !important;
+        border: none !important;
+        font-weight: bold !important;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      @media print {
+        body * {
+          visibility: hidden !important;
+        }
+        #printableBoardingPass,
+        #printableBoardingPass * {
+          visibility: visible !important;
+        }
+        #printableBoardingPass {
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          max-width: 850px;
+          z-index: 9999;
+        }
+        .no-print {
+          display: none !important;
+        }
+      }
     </style>
   </head>
   <body class="flex h-screen overflow-hidden bg-slate-50 md:flex-row flex-col">
+    <!-- Custom Toast Notification -->
     <div
       id="toastAlert"
       class="fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform translate-x-full opacity-0 text-white"
     >
-      <span class="font-medium text-sm" id="toastMsg"></span>
+      <span class="font-bold text-sm tracking-wide" id="toastMsg"></span>
     </div>
 
+    <!-- Custom Confirm Dialog -->
     <div
       id="customConfirmModal"
-      class="fixed inset-0 z-[150] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+      class="fixed inset-0 z-[150] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
     >
       <div
         class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
         onclick="closeConfirm()"
       ></div>
       <div
-        class="bg-white rounded-[24px] p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform duration-300"
+        class="bg-white rounded-3xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl scale-95 transition-transform duration-300"
         id="confirmBox"
       >
         <div
@@ -123,7 +163,7 @@
           class="text-xl font-black text-center text-slate-800 mb-2"
           id="confirmTitle"
         >
-          Confirm
+          Confirm Action
         </h3>
         <p
           class="text-center text-slate-500 text-sm font-medium mb-8"
@@ -136,20 +176,21 @@
             onclick="closeConfirm()"
             class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 w-full transition"
           >
-            បោះបង់ (Cancel)
+            បោះបង់
           </button>
           <button
             id="confirmBtn"
             class="px-5 py-3 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition"
           >
-            យល់ព្រម (Yes)
+            យល់ព្រម
           </button>
         </div>
       </div>
     </div>
 
+    <!-- Desktop Sidebar -->
     <aside
-      class="hidden md:flex w-[260px] bg-[#0B1120] text-slate-400 flex-col z-20 shadow-xl"
+      class="hidden md:flex w-[260px] bg-[#0B1120] text-slate-400 flex-col z-20 shadow-xl no-print"
     >
       <div class="h-20 flex items-center px-8 border-b border-slate-800/50">
         <h1 class="text-2xl font-bold text-white">
@@ -167,7 +208,7 @@
             <button
               onclick="switchTab('overview')"
               id="nav-overview"
-              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/10"
             >
               <svg
                 class="w-5 h-5 opacity-70"
@@ -176,15 +217,18 @@
                 viewBox="0 0 24 24"
               >
                 <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 ></path>
               </svg>
-              Overview
+              ផ្ទាំងសង្ខេប
             </button>
             <button
               onclick="switchTab('booking')"
               id="nav-booking"
-              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/10"
             >
               <svg
                 class="w-5 h-5 opacity-70"
@@ -193,15 +237,18 @@
                 viewBox="0 0 24 24"
               >
                 <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 ></path>
               </svg>
-              Booking
+              បង្កើតការកក់
             </button>
             <button
               onclick="switchTab('floorplan')"
               id="nav-floorplan"
-              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/10"
             >
               <svg
                 class="w-5 h-5 opacity-70"
@@ -210,15 +257,18 @@
                 viewBox="0 0 24 24"
               >
                 <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
                 ></path>
               </svg>
-              Manage Rooms
+              គ្រប់គ្រងបន្ទប់
             </button>
             <button
               onclick="switchTab('guestlist')"
               id="nav-guestlist"
-              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white"
+              class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition text-sm font-medium hover:text-white hover:bg-white/10"
             >
               <svg
                 class="w-5 h-5 opacity-70"
@@ -227,18 +277,28 @@
                 viewBox="0 0 24 24"
               >
                 <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
                 ></path>
               </svg>
-              Guest Database
+              ប្រវត្តិការកក់
             </button>
           </div>
         </div>
       </div>
       <div class="p-4 border-t border-slate-800/50">
         <button
-          onclick="logout()"
-          class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition font-bold text-sm"
+          onclick="
+            confirmDialog(
+              'ចាកចេញពីគណនី',
+              'តើអ្នកពិតជាចង់ចាកចេញមែនទេ?',
+              logout,
+              'logout',
+            )
+          "
+          class="flex items-center justify-center gap-2 w-full px-4 py-3 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition duration-300 font-bold text-sm shadow-md"
         >
           <svg
             class="w-5 h-5"
@@ -247,10 +307,13 @@
             viewBox="0 0 24 24"
           >
             <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             ></path>
           </svg>
-          Logout
+          ចាកចេញ
         </button>
       </div>
     </aside>
@@ -259,11 +322,11 @@
       class="flex-1 flex flex-col h-full overflow-y-auto pb-20 md:pb-0 relative"
     >
       <header
-        class="h-16 md:h-20 bg-white/80 backdrop-blur-md px-6 md:px-8 flex justify-between items-center sticky top-0 z-10 shadow-sm border-b border-slate-100"
+        class="h-16 md:h-20 bg-white/80 backdrop-blur-md px-6 md:px-8 flex justify-between items-center sticky top-0 z-10 shadow-sm border-b border-slate-100 no-print"
       >
         <div class="flex items-center gap-4">
           <span
-            class="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-[11px] font-bold"
+            class="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-full text-[11px] border border-blue-100 font-bold"
             ><span class="relative flex h-2 w-2"
               ><span
                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"
@@ -277,11 +340,12 @@
           <span
             id="headerTitle"
             class="text-lg md:text-xl font-bold text-slate-800 ml-2"
-            >Platform Overview</span
+            >ផ្ទាំងសង្ខេប</span
           >
         </div>
         <div class="flex items-center gap-3 font-bold text-sm text-slate-700">
-          <span class="text-slate-500 hidden sm:block text-xs"
+          <span
+            class="text-slate-500 hidden sm:block text-xs uppercase tracking-wider"
             >Administrator</span
           >
           <div
@@ -293,45 +357,92 @@
       </header>
 
       <div class="p-4 md:p-8 w-full max-w-7xl mx-auto">
+        <!-- Tab 1: Overview -->
         <div id="overview" class="tab-content active">
           <div
-            class="bg-[#EEF2FF] rounded-[20px] p-6 mb-6 flex flex-col md:flex-row items-center justify-between border border-[#E0E7FF] relative overflow-hidden"
+            class="bg-[#EEF2FF] rounded-[20px] p-6 mb-6 md:mb-8 flex flex-col md:flex-row items-center justify-between border border-[#E0E7FF] relative overflow-hidden"
           >
             <div class="relative z-10 text-center md:text-left mb-4 md:mb-0">
-              <h2 class="text-slate-800 text-lg font-black mb-1">
+              <h2 class="text-slate-800 text-lg md:text-xl font-black mb-1">
                 ស្កេនសំបុត្រភ្ញៀវយ៉ាងរហ័ស
               </h2>
               <p class="text-slate-600 text-xs md:text-[13px] mb-4">
-                ផ្ទៀងផ្ទាត់ការកក់ និងគ្រប់គ្រងភ្ញៀវដោយគ្រាន់តែស្កេន QR Code។
+                ផ្ទៀងផ្ទាត់ការកក់ និងគ្រប់គ្រងភ្ញៀវដោយគ្រាន់តែស្កេន QR
+                Code/Barcode។
               </p>
               <button
                 onclick="openScanner()"
-                class="bg-[#2563EB] hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm flex gap-2"
+                class="bg-[#2563EB] hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition text-sm flex items-center gap-2 mx-auto md:mx-0"
               >
-                📷 Open Smart Scanner
+                📷 ស្កេនឥឡូវនេះ
               </button>
+            </div>
+            <div
+              class="relative z-10 hidden md:flex items-center gap-3 opacity-90"
+            >
+              <div
+                class="bg-white border border-slate-200 rounded-xl shadow-sm rotate-[-15deg] transform translate-x-6 overflow-hidden w-28"
+              >
+                <div class="bg-[#E11D48] h-3 w-full"></div>
+                <div class="p-2 text-center">
+                  <div class="text-[8px] font-bold text-slate-400 mb-1">
+                    U-RENTAL
+                  </div>
+                  <div
+                    class="text-xs font-black tracking-[0.2em] text-slate-800"
+                  >
+                    ||| | |||
+                  </div>
+                </div>
+              </div>
+              <div
+                class="bg-white border border-slate-200 rounded-xl shadow-xl relative z-10 overflow-hidden w-36 scale-110"
+              >
+                <div
+                  class="bg-[#E11D48] text-white text-[8px] font-bold px-2 py-1 flex justify-between"
+                >
+                  <span>BOOKING</span><span>U-RENTAL</span>
+                </div>
+                <div class="p-3 text-center">
+                  <div class="text-[10px] font-bold text-slate-800 mb-1">
+                    Verify Ticket
+                  </div>
+                  <div
+                    class="text-sm font-black tracking-[0.2em] text-slate-800"
+                  >
+                    || |||| ||
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
             <div
               class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
             >
-              <h3 class="text-xs font-bold text-slate-500 uppercase mb-1">
+              <h3
+                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+              >
                 Total Rooms
               </h3>
-              <div class="text-2xl font-black text-slate-800" id="stat-total">
+              <div
+                class="text-2xl md:text-3xl font-black text-slate-800"
+                id="stat-total"
+              >
                 0
               </div>
             </div>
             <div
               class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
             >
-              <h3 class="text-xs font-bold text-slate-500 uppercase mb-1">
+              <h3
+                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+              >
                 Active Stays
               </h3>
               <div
-                class="text-2xl font-black text-emerald-600"
+                class="text-2xl md:text-3xl font-black text-emerald-600"
                 id="stat-active"
               >
                 0
@@ -340,26 +451,63 @@
             <div
               class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
             >
-              <h3 class="text-xs font-bold text-slate-500 uppercase mb-1">
-                Pending Bookings
+              <h3
+                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+              >
+                Pending
               </h3>
-              <div class="text-2xl font-black text-amber-500" id="stat-pending">
+              <div
+                class="text-2xl md:text-3xl font-black text-amber-500"
+                id="stat-pending"
+              >
                 0
               </div>
             </div>
             <div
               class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
             >
-              <h3 class="text-xs font-bold text-slate-500 uppercase mb-1">
-                Total Revenue
+              <h3
+                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+              >
+                Revenue
               </h3>
-              <div class="text-2xl font-black text-blue-600" id="stat-revenue">
+              <div
+                class="text-2xl md:text-3xl font-black text-blue-600"
+                id="stat-revenue"
+              >
                 $0.00
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div
+              class="xl:col-span-2 bg-white rounded-[20px] border border-slate-200 shadow-sm p-6"
+            >
+              <h3 class="text-sm font-bold text-slate-800 mb-6">
+                ស្ថិតិការកក់ (Last 7 Days)
+              </h3>
+              <div class="h-64 w-full">
+                <canvas id="realBookingChart"></canvas>
+              </div>
+            </div>
+            <div
+              class="bg-white rounded-[20px] border border-slate-200 shadow-sm p-6 overflow-hidden flex flex-col"
+            >
+              <h3 class="text-sm font-bold text-slate-800 mb-4">
+                ការកក់ថ្មីៗ (Recent Tickets)
+              </h3>
+              <div
+                id="recentTicketsContainer"
+                class="flex-1 overflow-y-auto space-y-4 pr-2"
+              >
+                <!-- Injected via JS -->
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Tab 2: Create Booking -->
         <div id="booking" class="tab-content max-w-4xl mx-auto">
           <div
             class="bg-white rounded-[24px] shadow-sm border border-slate-100 p-6 md:p-10"
@@ -368,7 +516,7 @@
               class="flex items-center gap-4 mb-8 border-b border-slate-100 pb-6"
             >
               <div
-                class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl shadow-inner"
+                class="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl md:text-2xl shadow-inner"
               >
                 📝
               </div>
@@ -376,8 +524,8 @@
                 <h2 class="text-xl md:text-2xl font-black text-slate-800">
                   បង្កើតការកក់ថ្មី
                 </h2>
-                <p class="text-xs md:text-sm text-slate-500 font-medium">
-                  បំពេញព័ត៌មានភ្ញៀវ
+                <p class="text-xs md:text-sm text-slate-500 font-medium mt-1">
+                  បំពេញព័ត៌មានភ្ញៀវ និងជម្រើសទូទាត់
                 </p>
               </div>
             </div>
@@ -385,104 +533,206 @@
             <form
               id="adminBookingForm"
               onsubmit="submitBooking(event)"
-              class="grid grid-cols-1 md:grid-cols-2 gap-6"
+              class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6"
             >
               <div class="md:col-span-2">
                 <label
-                  class="block text-xs font-bold text-slate-500 uppercase mb-2"
-                  >ជ្រើសរើសបន្ទប់</label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ជ្រើសរើសបន្ទប់ទំនេរ</label
                 >
                 <select
                   id="roomSelect"
-                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none font-bold text-slate-700"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700"
                   required
-                ></select>
+                  onchange="fetchBookedSlots()"
+                >
+                  <option value="" disabled selected>
+                    -- កំពុងទាញយកទិន្នន័យបន្ទប់ --
+                  </option>
+                </select>
+                <div
+                  id="liveStatusBox"
+                  class="mt-3 hidden bg-amber-50 border border-amber-200 p-4 rounded-xl shadow-sm"
+                >
+                  <h4 class="text-xs font-bold text-amber-800 mb-2">
+                    ⚠️ ម៉ោងដែលមានគេកក់រួចហើយ:
+                  </h4>
+                  <div id="slotsContainer" class="flex flex-wrap gap-2"></div>
+                </div>
               </div>
+
               <div>
                 <label
-                  class="block text-xs font-bold text-slate-500 uppercase mb-2"
-                  >ឈ្មោះភ្ញៀវ</label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ឈ្មោះភ្ញៀវ (Guest Name)</label
                 >
                 <input
                   type="text"
                   id="tenant_name"
-                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-medium text-slate-700"
+                  placeholder="ឧ. Sok Dara"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-700"
                   required
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-bold text-slate-500 uppercase mb-2"
-                  >លេខទូរស័ព្ទ</label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >លេខទូរស័ព្ទ (Phone)</label
                 >
                 <input
                   type="text"
                   id="tenant_phone"
-                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-medium text-slate-700"
+                  placeholder="012 345 678"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 transition-all font-medium text-slate-700"
                   required
                 />
               </div>
+
               <div>
                 <label
-                  class="block text-xs font-bold text-slate-500 uppercase mb-2"
-                  >ថ្ងៃចូល</label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ថ្ងៃចូល (Check-In)</label
                 >
                 <input
                   type="datetime-local"
                   id="checkInInput"
-                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-slate-700"
+                  onchange="validateLiveDates()"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700"
                   required
                 />
               </div>
               <div>
                 <label
-                  class="block text-xs font-bold text-slate-500 uppercase mb-2"
-                  >ថ្ងៃចេញ</label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ថ្ងៃចេញ (Check-Out)</label
                 >
                 <input
                   type="datetime-local"
                   id="checkOutInput"
-                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 font-bold text-slate-700"
+                  onchange="validateLiveDates()"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 transition-all font-bold text-slate-700"
                   required
                 />
               </div>
-              <div class="md:col-span-2 flex gap-4 mt-4">
-                <select
-                  id="paymentStatus"
-                  class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 shadow-sm"
-                  required
+
+              <div
+                class="md:col-span-2 bg-[#F8FAFC] p-5 md:p-6 rounded-2xl border border-slate-200 mt-2"
+              >
+                <h3
+                  class="text-sm font-black text-slate-800 mb-5 flex items-center gap-2"
                 >
-                  <option value="unpaid" class="text-red-500">
-                    ❌ មិនទាន់បង់ (POS)
-                  </option>
-                  <option value="paid" class="text-emerald-600">
-                    ✅ បង់រួចរាល់
-                  </option>
-                </select>
+                  <svg
+                    class="w-5 h-5 text-blue-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                    ></path>
+                  </svg>
+                  ផ្នែកទូទាត់ប្រាក់ (Payment)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  <div>
+                    <label
+                      class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                      >វិធីសាស្ត្រ (Method)</label
+                    >
+                    <select
+                      id="paymentMethod"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-bold text-slate-700 shadow-sm"
+                      required
+                    >
+                      <option value="cash">💵 ទូទាត់សាច់ប្រាក់ (Cash)</option>
+                      <option value="online">💳 U-Pay / Online</option>
+                      <option value="card">💳 ឆូតកាត (Card Swipe)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                      >ស្ថានភាព (Status)</label
+                    >
+                    <select
+                      id="paymentStatus"
+                      class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 font-bold text-slate-700 shadow-sm"
+                      required
+                      onchange="updateSubmitButton()"
+                    >
+                      <option value="unpaid" class="text-red-500 font-bold">
+                        ❌ មិនទាន់បង់ (ទៅកាន់ POS)
+                      </option>
+                      <option value="paid" class="text-emerald-600 font-bold">
+                        ✅ បង់រួចរាល់ (Paid)
+                      </option>
+                    </select>
+                  </div>
+                  <div class="md:col-span-2">
+                    <div
+                      id="paymentNote"
+                      class="bg-white p-4 rounded-xl border-l-4 border-blue-500 text-sm font-medium text-slate-600 shadow-sm flex items-center gap-3"
+                    >
+                      <span class="text-xl">💡</span
+                      ><span
+                        >សូមជ្រើសរើសបន្ទប់ និងម៉ោងចេញចូលដើម្បីគណនាតម្លៃ។</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="md:col-span-2">
+                <label
+                  class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2"
+                  >ស្ថានភាពកក់ (Booking Status)</label
+                >
                 <select
                   id="bookingStatus"
-                  class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 shadow-sm"
+                  class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 font-bold text-slate-700"
                   required
                 >
-                  <option value="booked">📅 កក់ទុកមុន</option>
-                  <option value="checked_in">📥 ចូលស្នាក់នៅ</option>
+                  <option value="booked">📅 កក់ទុកមុន (Advance Booking)</option>
+                  <option value="checked_in">
+                    📥 ចូលស្នាក់នៅភ្លាម (Check-In)
+                  </option>
                 </select>
               </div>
-              <div class="md:col-span-2 mt-4">
+
+              <div
+                id="liveErrorBanner"
+                class="hidden md:col-span-2 bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-center shadow-sm font-bold items-center justify-center gap-2 text-sm"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd"
+                  ></path>
+                </svg>
+                ម៉ោងនេះមានគេកក់រួចហើយ! សូមប្តូរម៉ោងថ្មី។
+              </div>
+
+              <div class="md:col-span-2 mt-2">
                 <button
                   type="submit"
                   id="submitBookBtn"
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2"
                 >
-                  រក្សាទុកការកក់ ✅
+                  បន្តទៅកាន់ម៉ាស៊ីន POS (Pay Now) 💳
                 </button>
               </div>
             </form>
           </div>
         </div>
 
+        <!-- Tab 3: Floor Plan & Management -->
         <div id="floorplan" class="tab-content">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Manage Types -->
             <div
               class="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6 flex flex-col"
             >
@@ -495,21 +745,27 @@
                 <input
                   type="text"
                   id="new_type_name"
-                  placeholder="ប្រភេទថ្មី..."
-                  class="flex-1 border rounded-xl px-4 py-2 text-sm"
+                  placeholder="បញ្ចូលប្រភេទថ្មី..."
+                  class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-sm"
                   required
                 />
                 <button
                   type="submit"
-                  class="bg-[#0B1120] text-white px-5 py-2 rounded-xl text-sm font-bold"
+                  class="bg-[#0B1120] hover:bg-slate-800 text-white font-bold px-5 py-2 rounded-xl shadow transition text-sm"
                 >
                   បញ្ចូល
                 </button>
               </form>
-              <table class="w-full text-left text-sm">
-                <tbody id="typesTableBody"></tbody>
-              </table>
+              <div class="flex-1 overflow-y-auto max-h-[200px] pr-2">
+                <table class="w-full text-left text-sm">
+                  <tbody id="typesTableBody" class="divide-y divide-slate-100">
+                    <!-- JS Render -->
+                  </tbody>
+                </table>
+              </div>
             </div>
+
+            <!-- Add Room -->
             <div
               class="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6"
             >
@@ -523,8 +779,8 @@
                   <input
                     type="text"
                     id="new_room_number"
-                    placeholder="លេខបន្ទប់"
-                    class="w-1/2 border rounded-xl px-4 py-3 text-sm"
+                    placeholder="លេខបន្ទប់ (A01)"
+                    class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500 text-sm"
                     required
                   />
                   <input
@@ -532,19 +788,21 @@
                     step="0.01"
                     id="new_room_price"
                     placeholder="តម្លៃ ($)"
-                    class="w-1/2 border rounded-xl px-4 py-3 text-sm"
+                    class="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500 text-sm"
                     required
                   />
                 </div>
-                <div class="flex gap-3">
+                <div class="flex flex-col md:flex-row gap-3">
                   <select
                     id="new_room_type"
-                    class="flex-1 border rounded-xl px-4 py-3 text-sm"
+                    class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-emerald-500 text-sm"
                     required
-                  ></select>
+                  >
+                    <!-- JS Render -->
+                  </select>
                   <button
                     type="submit"
-                    class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold text-sm"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition text-sm"
                   >
                     រក្សាទុក
                   </button>
@@ -552,54 +810,104 @@
               </form>
             </div>
           </div>
+
+          <!-- Interactive Floor Plan -->
           <div
             class="bg-white rounded-[20px] shadow-sm border border-slate-100 p-6 md:p-8"
           >
-            <h2
-              class="text-xl font-bold text-slate-800 border-l-4 border-slate-500 pl-3 mb-6"
+            <div class="flex justify-between items-center mb-6">
+              <h2
+                class="text-xl font-bold text-slate-800 border-l-4 border-slate-500 pl-3"
+              >
+                Interactive Floor Plan
+              </h2>
+              <button
+                onclick="loadData()"
+                class="p-2 bg-slate-100 rounded-lg text-slate-600 hover:bg-slate-200 transition"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div
+              class="flex flex-wrap gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs font-bold text-slate-600"
             >
-              Floor Plan
-            </h2>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                ទំនេរ (អាចកក់បាន)
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                មានភ្ញៀវស្នាក់នៅ (Occupied)
+              </div>
+            </div>
+
             <div
               id="floorplanGrid"
-              class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
-            ></div>
+              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6"
+            >
+              <!-- JS Render -->
+            </div>
           </div>
         </div>
 
+        <!-- Tab 4: Guestlist -->
         <div id="guestlist" class="tab-content">
           <div
             class="bg-white rounded-[20px] shadow-sm border border-slate-100 overflow-hidden"
           >
             <div
-              class="p-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4"
+              class="p-5 md:p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center bg-white gap-4"
             >
               <h2
                 class="text-lg font-bold text-slate-800 border-l-4 border-blue-500 pl-3"
               >
                 Guest Database
               </h2>
-              <input
-                type="text"
-                id="searchInput"
-                onkeyup="searchTable()"
-                placeholder="Search..."
-                class="border border-slate-200 rounded-xl px-4 py-2 w-full md:w-64"
-              />
+              <div class="flex gap-2 w-full md:w-auto">
+                <button
+                  onclick="openScanner()"
+                  class="bg-[#0B1120] flex-1 md:flex-none justify-center text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm transition transform hover:-translate-y-0.5"
+                >
+                  📷 Scan
+                </button>
+                <input
+                  type="text"
+                  id="searchInput"
+                  onkeyup="searchTable()"
+                  placeholder="ស្វែងរកលេខកូដ, ឈ្មោះ..."
+                  class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 w-full md:w-64 outline-none text-sm focus:border-blue-500"
+                />
+              </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full clean-table text-left" id="guestTable">
                 <thead>
-                  <tr class="bg-slate-50">
-                    <th>Ref & Room</th>
-                    <th>Guest</th>
-                    <th>Schedule</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th class="text-right">Action</th>
+                  <tr
+                    class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider"
+                  >
+                    <th class="px-6 pt-4 pb-4">Ref & Room</th>
+                    <th class="px-6 pt-4 pb-4">Guest</th>
+                    <th class="px-6 pt-4 pb-4">Schedule</th>
+                    <th class="px-6 pt-4 pb-4">Payment</th>
+                    <th class="px-6 pt-4 pb-4">Status</th>
+                    <th class="px-6 pt-4 pb-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody id="guestTableBody" class="text-sm"></tbody>
+                <tbody id="guestTableBody" class="text-sm">
+                  <!-- JS Render -->
+                </tbody>
               </table>
             </div>
           </div>
@@ -607,88 +915,361 @@
       </div>
     </main>
 
+    <!-- Mobile Bottom Navigation -->
     <div
-      class="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around h-16 z-50"
+      class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 flex justify-around items-center h-16 z-50 pb-safe shadow-[0_-4px_15px_rgba(0,0,0,0.05)] no-print"
     >
       <button
         onclick="switchTab('overview')"
         id="mob-overview"
-        class="flex flex-col items-center justify-center w-1/4 text-slate-400 nav-mobile-active"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 nav-mobile-active transition-colors"
       >
-        🏠<span class="text-[10px]">ទំព័រដើម</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">ទំព័រដើម</span>
       </button>
       <button
         onclick="switchTab('booking')"
         id="mob-booking"
-        class="flex flex-col items-center justify-center w-1/4 text-slate-400"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
       >
-        📝<span class="text-[10px]">កក់បន្ទប់</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">កក់បន្ទប់</span>
       </button>
       <button
         onclick="switchTab('floorplan')"
         id="mob-floorplan"
-        class="flex flex-col items-center justify-center w-1/4 text-slate-400"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
       >
-        🚪<span class="text-[10px]">បន្ទប់</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">គ្រប់គ្រង</span>
       </button>
       <button
         onclick="switchTab('guestlist')"
         id="mob-guestlist"
-        class="flex flex-col items-center justify-center w-1/4 text-slate-400"
+        class="flex flex-col items-center gap-1 w-1/4 text-slate-400 transition-colors"
       >
-        📋<span class="text-[10px]">ប្រវត្តិ</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+          ></path>
+        </svg>
+        <span class="text-[10px] font-bold">បញ្ជីភ្ញៀវ</span>
       </button>
     </div>
 
+    <!-- Edit/Update Modals -->
+    <div
+      id="editTypeModal"
+      class="fixed inset-0 z-[120] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModals()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl"
+      >
+        <h3
+          class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-3"
+        >
+          កែប្រែប្រភេទបន្ទប់
+        </h3>
+        <form onsubmit="submitEditType(event)">
+          <input type="hidden" id="edit_type_id" />
+          <div class="mb-6">
+            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase"
+              >ឈ្មោះប្រភេទ</label
+            >
+            <input
+              type="text"
+              id="edit_type_name"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick="closeEditModals()"
+              class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl transition"
+            >
+              បោះបង់
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-[#0B1120] text-white font-bold py-3 rounded-xl shadow transition"
+            >
+              រក្សាទុក
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="editRoomModal"
+      class="fixed inset-0 z-[120] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModals()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm shadow-2xl"
+      >
+        <h3
+          class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-blue-500 pl-3"
+        >
+          កែប្រែព័ត៌មានបន្ទប់
+        </h3>
+        <form onsubmit="submitEditRoom(event)">
+          <input type="hidden" id="edit_room_id" />
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase"
+              >លេខបន្ទប់</label
+            >
+            <input
+              type="text"
+              id="edit_room_number"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase"
+              >ប្រភេទបន្ទប់</label
+            >
+            <select
+              id="edit_type_id_select"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            ></select>
+          </div>
+          <div class="mb-6">
+            <label class="block text-xs font-bold text-slate-500 mb-2 uppercase"
+              >តម្លៃប្រចាំថ្ងៃ ($)</label
+            >
+            <input
+              type="number"
+              step="0.01"
+              id="edit_price"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+              required
+            />
+          </div>
+          <div class="flex gap-3">
+            <button
+              type="button"
+              onclick="closeEditModals()"
+              class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl transition"
+            >
+              បោះបង់
+            </button>
+            <button
+              type="submit"
+              class="flex-1 bg-[#0B1120] text-white font-bold py-3 rounded-xl shadow transition"
+            >
+              រក្សាទុក
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="editBookingModal"
+      class="fixed inset-0 z-[120] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <div
+        class="bg-slate-900/60 backdrop-blur-sm absolute inset-0"
+        onclick="closeEditModals()"
+      ></div>
+      <div
+        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-md shadow-2xl scale-95 transition-transform"
+        id="editBookingBox"
+      >
+        <h3
+          class="text-lg font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3"
+        >
+          កែប្រែព័ត៌មានភ្ញៀវ
+        </h3>
+        <form onsubmit="submitEditBooking(event)">
+          <input type="hidden" id="edit_b_id" />
+          <div class="space-y-4">
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >ឈ្មោះភ្ញៀវ</label
+              ><input
+                type="text"
+                id="edit_b_name"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >លេខទូរស័ព្ទ</label
+              ><input
+                type="text"
+                id="edit_b_phone"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-bold text-slate-500 mb-1 uppercase"
+                >ប្តូរបន្ទប់</label
+              >
+              <select
+                id="edit_b_room"
+                class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 text-sm"
+                required
+              ></select>
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end gap-3">
+            <button
+              type="button"
+              onclick="closeEditModals()"
+              class="px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition"
+            >
+              បោះបង់
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition"
+            >
+              រក្សាទុក
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scanner Modal -->
     <div
       id="scannerModal"
       class="fixed inset-0 z-[110] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
     >
       <div
-        class="bg-slate-900/90 absolute inset-0"
+        class="bg-slate-900/90 backdrop-blur-md absolute inset-0"
         onclick="closeScanner()"
       ></div>
       <div
-        class="bg-white rounded-[24px] p-6 relative z-10 w-[95%] max-w-md shadow-2xl scale-95 transition-transform"
+        class="bg-white rounded-[24px] p-6 relative z-10 w-[95%] max-w-md shadow-2xl scale-95 transition-transform duration-400"
         id="scannerBox"
       >
-        <button
-          onclick="closeScanner()"
-          class="absolute top-4 right-4 bg-slate-100 rounded-full w-8 h-8 font-bold text-red-500"
-        >
-          ✕
-        </button>
-        <h3 class="text-lg font-black text-slate-800 mb-4">Smart QR Scanner</h3>
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h3 class="text-lg font-black text-slate-800">Smart Scanner</h3>
+            <p class="text-[11px] text-slate-500 font-medium mt-1">
+              ស្កេន Barcode/QR ដើម្បីមើលព័ត៌មាន
+            </p>
+          </div>
+          <button
+            onclick="closeScanner()"
+            class="bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 transition"
+          >
+            ✕
+          </button>
+        </div>
         <div
-          id="reader"
-          class="rounded-2xl overflow-hidden bg-black aspect-square"
-        ></div>
+          class="relative w-full aspect-square rounded-2xl overflow-hidden bg-black border-4 border-slate-100 shadow-inner"
+        >
+          <div id="reader" class="absolute inset-0 w-full h-full"></div>
+          <div
+            class="absolute inset-0 pointer-events-none border-2 border-[#3B82F6]/50 rounded-xl z-10 m-4"
+          >
+            <div
+              class="w-full h-1 bg-[#3B82F6] shadow-[0_0_15px_#3B82F6] absolute top-0 left-0 animate-[scan_2s_ease-in-out_infinite]"
+            ></div>
+          </div>
+        </div>
+        <style>
+          @keyframes scan {
+            0%,
+            100% {
+              top: 0%;
+            }
+            50% {
+              top: 100%;
+            }
+          }
+        </style>
       </div>
     </div>
 
+    <!-- Boarding Pass Modal -->
     <div
       id="boardingPassModal"
       class="fixed inset-0 z-[120] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4"
     >
       <div
-        class="bg-slate-900/80 absolute inset-0"
+        class="bg-slate-900/80 backdrop-blur-sm absolute inset-0"
         onclick="closeBoardingPass()"
       ></div>
       <div
-        class="relative z-10 scale-95 transition-transform w-full max-w-[800px]"
+        class="relative z-10 scale-95 transition-transform duration-400 transform w-full max-w-[800px]"
         id="bpBox"
       >
         <div id="bpContentContainer"></div>
-        <div class="flex justify-center gap-4 mt-8 no-print">
+        <div class="flex justify-center gap-4 mt-8 relative z-10 no-print">
           <button
             onclick="window.print()"
-            class="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold"
+            class="bg-slate-800 text-white text-sm font-bold px-8 py-3.5 rounded-xl shadow-xl hover:bg-slate-900 transition transform hover:-translate-y-1"
           >
             🖨️ Print Ticket
           </button>
           <button
             onclick="closeBoardingPass()"
-            class="bg-white text-slate-800 px-8 py-3 rounded-xl font-bold"
+            class="bg-white text-slate-800 text-sm font-bold px-8 py-3.5 rounded-xl shadow-xl hover:bg-slate-100 transition transform hover:-translate-y-1"
           >
             បិទ (Close)
           </button>
@@ -696,149 +1277,106 @@
       </div>
     </div>
 
-    <div
-      id="editRoomModal"
-      class="fixed inset-0 z-[130] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity"
-    >
-      <div
-        class="bg-slate-900/60 absolute inset-0"
-        onclick="closeEditModal('editRoomModal', 'editRoomBox')"
-      ></div>
-      <div
-        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm scale-95 transition-transform"
-        id="editRoomBox"
-      >
-        <h3 class="text-lg font-bold mb-4">កែប្រែបន្ទប់</h3>
-        <input type="hidden" id="edit_room_id" />
-        <input
-          type="text"
-          id="edit_room_number"
-          class="w-full border rounded-xl px-4 py-3 mb-4 text-sm"
-          placeholder="លេខបន្ទប់"
-        />
-        <select
-          id="edit_room_type"
-          class="w-full border rounded-xl px-4 py-3 mb-4 text-sm"
-        ></select>
-        <input
-          type="number"
-          id="edit_room_price"
-          class="w-full border rounded-xl px-4 py-3 mb-6 text-sm"
-          placeholder="តម្លៃ"
-        />
-        <div class="flex gap-2">
-          <button
-            onclick="closeEditModal('editRoomModal', 'editRoomBox')"
-            class="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-600"
-          >
-            Cancel
-          </button>
-          <button
-            onclick="saveEditRoom()"
-            class="flex-1 bg-[#0B1120] text-white py-3 rounded-xl font-bold"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="editTypeModal"
-      class="fixed inset-0 z-[130] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity"
-    >
-      <div
-        class="bg-slate-900/60 absolute inset-0"
-        onclick="closeEditModal('editTypeModal', 'editTypeBox')"
-      ></div>
-      <div
-        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm scale-95 transition-transform"
-        id="editTypeBox"
-      >
-        <h3 class="text-lg font-bold mb-4">កែប្រែប្រភេទបន្ទប់</h3>
-        <input type="hidden" id="edit_type_id" />
-        <input
-          type="text"
-          id="edit_type_name"
-          class="w-full border rounded-xl px-4 py-3 mb-6 text-sm"
-        />
-        <div class="flex gap-2">
-          <button
-            onclick="closeEditModal('editTypeModal', 'editTypeBox')"
-            class="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-600"
-          >
-            Cancel
-          </button>
-          <button
-            onclick="saveEditType()"
-            class="flex-1 bg-[#0B1120] text-white py-3 rounded-xl font-bold"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div
-      id="editBookingModal"
-      class="fixed inset-0 z-[130] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity"
-    >
-      <div
-        class="bg-slate-900/60 absolute inset-0"
-        onclick="closeEditModal('editBookingModal', 'editBookingBox')"
-      ></div>
-      <div
-        class="bg-white rounded-2xl p-8 relative z-10 w-[90%] max-w-sm scale-95 transition-transform"
-        id="editBookingBox"
-      >
-        <h3 class="text-lg font-bold mb-4">កែប្រែព័ត៌មានភ្ញៀវ</h3>
-        <input type="hidden" id="edit_booking_id" />
-        <input
-          type="text"
-          id="edit_b_name"
-          class="w-full border rounded-xl px-4 py-3 mb-4 text-sm"
-          placeholder="ឈ្មោះ"
-        />
-        <input
-          type="text"
-          id="edit_b_phone"
-          class="w-full border rounded-xl px-4 py-3 mb-4 text-sm"
-          placeholder="លេខទូរស័ព្ទ"
-        />
-        <select
-          id="edit_b_room"
-          class="w-full border rounded-xl px-4 py-3 mb-6 text-sm"
-        ></select>
-        <div class="flex gap-2">
-          <button
-            onclick="closeEditModal('editBookingModal', 'editBookingBox')"
-            class="flex-1 bg-slate-100 py-3 rounded-xl font-bold text-slate-600"
-          >
-            Cancel
-          </button>
-          <button
-            onclick="saveEditBooking()"
-            class="flex-1 bg-[#0B1120] text-white py-3 rounded-xl font-bold"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
+    <!-- JS Application Logic -->
     <script>
-      if (localStorage.getItem("user_role") !== "admin")
+      // Check Auth
+      if (localStorage.getItem("user_role") !== "admin") {
         window.location.href = "/index.html";
+      }
       function logout() {
         localStorage.clear();
         window.location.href = "/index.html";
       }
 
+      // State Management
       let state = { rooms: [], types: [], bookings: [], stats: {} };
 
-      // Core Functions
+      // Toast Notification
+      function showToast(message, type = "error") {
+        let t = document.getElementById("toastAlert");
+        let m = document.getElementById("toastMsg");
+        m.innerText = message;
+        t.className = `fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform text-white ${type === "error" ? "bg-red-600" : "bg-[#10B981]"}`;
+        t.classList.add("toast-show");
+        setTimeout(() => {
+          t.classList.remove("toast-show");
+        }, 3500);
+      }
+
+      // Custom Confirm Dialog
+      let confirmActionCb = null;
+      function confirmDialog(title, text, cb, type = "normal") {
+        let icon = document.getElementById("confirmIcon");
+        let btn = document.getElementById("confirmBtn");
+
+        document.getElementById("confirmTitle").innerText = title;
+        document.getElementById("confirmText").innerText = text;
+
+        if (type === "delete") {
+          icon.innerText = "🗑️";
+          icon.className =
+            "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-red-100 text-red-500";
+          btn.className =
+            "px-5 py-3 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-red-600 hover:bg-red-700";
+        } else if (type === "status") {
+          icon.innerText = "🔄";
+          icon.className =
+            "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-amber-100 text-amber-600";
+          btn.className =
+            "px-5 py-3 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-amber-600 hover:bg-amber-700";
+        } else {
+          icon.innerText = "❓";
+          icon.className =
+            "w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl bg-slate-100 text-slate-600";
+          btn.className =
+            "px-5 py-3 rounded-xl text-sm font-bold text-white w-full text-center shadow-lg transition bg-slate-800 hover:bg-slate-900";
+        }
+
+        confirmActionCb = cb;
+        document
+          .getElementById("customConfirmModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("confirmBox").classList.remove("scale-95");
+        }, 10);
+      }
+
+      document.getElementById("confirmBtn").addEventListener("click", () => {
+        if (confirmActionCb) confirmActionCb();
+        closeConfirm();
+      });
+
+      function closeConfirm() {
+        document.getElementById("confirmBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("customConfirmModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
+      }
+
+      // Formatting Helpers
+      function formatShortId(id) {
+        return id ? id.slice(-6).toUpperCase() : "000000";
+      }
+      function formatBarcode(id, roomNumber) {
+        return `BK-${formatShortId(id)}-${roomNumber || "N/A"}`;
+      }
+
+      function formatDate(isoString) {
+        if (!isoString) return "N/A";
+        return new Date(isoString).toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Tab Management
       function switchTab(tabId) {
-        ["overview", "booking", "floorplan", "guestlist"].forEach((id) => {
+        const btns = ["overview", "booking", "floorplan", "guestlist"];
+        btns.forEach((id) => {
           let dBtn = document.getElementById("nav-" + id);
           let mBtn = document.getElementById("mob-" + id);
           if (dBtn) {
@@ -847,32 +1385,55 @@
           }
           if (mBtn) mBtn.classList.toggle("nav-mobile-active", id === tabId);
         });
+
         document
           .querySelectorAll(".tab-content")
           .forEach((el) => el.classList.remove("active"));
         document.getElementById(tabId).classList.add("active");
-      }
 
-      async function loadData() {
-        try {
-          let [statsRes, roomsRes, typesRes, bookingsRes] = await Promise.all([
-            fetch("/api/stats"),
-            fetch("/api/rooms"),
-            fetch("/api/room-types"),
-            fetch("/api/bookings"),
-          ]);
-          state.stats = await statsRes.json();
-          state.rooms = await roomsRes.json();
-          state.types = await typesRes.json();
-          state.bookings = await bookingsRes.json();
-          renderAll();
-        } catch (err) {
-          showToast("Error loading data", "error");
+        const titles = {
+          overview: "ផ្ទាំងសង្ខេប",
+          booking: "បង្កើតការកក់ថ្មី",
+          floorplan: "គ្រប់គ្រងបន្ទប់",
+          guestlist: "ប្រវត្តិការកក់",
+        };
+        document.getElementById("headerTitle").innerText = titles[tabId];
+
+        if (tabId === "overview") setTimeout(initChart, 200);
+        if (tabId === "booking") {
+          renderRoomSelect();
+          validateLiveDates();
         }
       }
 
-      function renderAll() {
-        // Stats
+      // Fetch Data
+      async function loadData() {
+        try {
+          const [statsRes, roomsRes, typesRes, bookingsRes] = await Promise.all(
+            [
+              fetch("/api/stats").catch(() => null),
+              fetch("/api/rooms").catch(() => null),
+              fetch("/api/room-types").catch(() => null),
+              fetch("/api/bookings").catch(() => null),
+            ],
+          );
+
+          if (statsRes) state.stats = await statsRes.json();
+          if (roomsRes) state.rooms = await roomsRes.json();
+          if (typesRes) state.types = await typesRes.json();
+          if (bookingsRes) state.bookings = await bookingsRes.json();
+
+          renderOverview();
+          renderRoomTypes();
+          renderFloorplan();
+          renderGuestList();
+        } catch (err) {
+          console.error("Fetch Error:", err);
+        }
+      }
+
+      // Render Overview
+      function renderOverview() {
         document.getElementById("stat-total").innerText =
           state.stats.total_rooms || 0;
         document.getElementById("stat-active").innerText =
@@ -882,412 +1443,741 @@
         document.getElementById("stat-revenue").innerText =
           "$" + (state.stats.revenue || 0).toFixed(2);
 
-        // Types
-        let tBody = document.getElementById("typesTableBody");
-        let tSelect = document.getElementById("new_room_type");
-        let eTypeSelect = document.getElementById("edit_room_type");
-        tBody.innerHTML = "";
-        tSelect.innerHTML = "<option disabled selected>ជ្រើសរើសប្រភេទ</option>";
-        eTypeSelect.innerHTML = "";
+        const recentContainer = document.getElementById(
+          "recentTicketsContainer",
+        );
+        recentContainer.innerHTML = "";
+
+        let recentBookings = state.bookings.slice(0, 4);
+        if (recentBookings.length === 0) {
+          recentContainer.innerHTML = `<div class="text-sm text-slate-400 italic text-center py-4">មិនទាន់មានការកក់ទេ។</div>`;
+        } else {
+          recentBookings.forEach((b) => {
+            let color =
+              b.status === "checked_in"
+                ? "bg-emerald-500"
+                : b.status === "booked"
+                  ? "bg-amber-500"
+                  : "bg-slate-400";
+            let time = formatDate(b.createdAt || b.check_in_time);
+            let roomNum = b.room_id ? b.room_id.room_number : "N/A";
+
+            recentContainer.innerHTML += `
+                    <div class="bg-slate-50 rounded-xl p-3 flex items-center gap-3 border border-slate-100 shadow-sm cursor-pointer hover:bg-slate-100 transition" onclick="showTicketModal('${encodeURIComponent(JSON.stringify(b))}')">
+                        <div class="w-1.5 h-10 rounded-full ${color}"></div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold text-slate-800">${b.tenant_name} <span class="text-slate-400 text-xs font-normal">(${b.tenant_phone})</span></h4>
+                            <div class="text-[10px] text-slate-500 mt-0.5 flex justify-between">
+                                <span>Room ${roomNum}</span>
+                                <span class="font-mono text-blue-500 font-bold">${formatBarcode(b._id, roomNum)}</span>
+                            </div>
+                        </div>
+                    </div>`;
+          });
+        }
+      }
+
+      // Render Room Types & Modals
+      function renderRoomTypes() {
+        const tbody = document.getElementById("typesTableBody");
+        const select = document.getElementById("new_room_type");
+        const editSelect = document.getElementById("edit_type_id_select");
+
+        tbody.innerHTML = "";
+        select.innerHTML =
+          '<option value="" disabled selected>-- ជ្រើសរើសប្រភេទ --</option>';
+        editSelect.innerHTML = "";
 
         state.types.forEach((t) => {
-          tSelect.innerHTML += `<option value="${t._id}">${t.type_name}</option>`;
-          eTypeSelect.innerHTML += `<option value="${t._id}">${t.type_name}</option>`;
-          tBody.innerHTML += `
-                <tr class="border-b border-slate-100 group">
-                    <td class="py-3 font-medium">${t.type_name}</td>
+          let opt = `<option value="${t._id}">${t.type_name}</option>`;
+          select.innerHTML += opt;
+          editSelect.innerHTML += opt;
+
+          tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0 group transition">
+                    <td class="py-3 font-medium text-slate-700">${t.type_name}</td>
                     <td class="py-3 text-right">
-                        <button onclick="openEditType('${t._id}', '${t.type_name}')" class="text-blue-500 mx-2">✏️</button>
-                        <button onclick="deleteType('${t._id}')" class="text-red-500">🗑️</button>
+                        <button onclick="openEditTypeModal('${t._id}', '${t.type_name}')" class="text-blue-500 hover:text-blue-700 w-8 h-8 rounded-lg hover:bg-blue-50 transition">✏️</button>
+                        <button onclick="deleteType('${t._id}')" class="text-red-400 hover:text-red-600 w-8 h-8 rounded-lg hover:bg-red-50 transition ml-1">🗑️</button>
                     </td>
                 </tr>`;
         });
+      }
 
-        // Rooms Grid & Selects
-        let grid = document.getElementById("floorplanGrid");
-        let rSelect = document.getElementById("roomSelect");
-        let eRoomSelect = document.getElementById("edit_b_room");
+      // Render Floor Plan
+      function renderFloorplan() {
+        const grid = document.getElementById("floorplanGrid");
         grid.innerHTML = "";
-        rSelect.innerHTML = "<option disabled selected>ជ្រើសរើសបន្ទប់</option>";
-        eRoomSelect.innerHTML = "";
+        let sortedRooms = [...state.rooms].sort((a, b) =>
+          a.room_number.localeCompare(b.room_number),
+        );
 
-        state.rooms.forEach((r) => {
-          if (r.status === "available")
-            rSelect.innerHTML += `<option value="${r._id}">Room ${r.room_number} ($${r.price})</option>`;
-          eRoomSelect.innerHTML += `<option value="${r._id}">Room ${r.room_number}</option>`;
+        sortedRooms.forEach((r) => {
+          let isOccupied = r.status === "occupied";
+          let bg = isOccupied
+            ? "bg-red-50 border-red-200 text-red-700"
+            : "bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 cursor-pointer";
+          let typeName = r.type_id ? r.type_id.type_name : "N/A";
+          let typeId = r.type_id ? r.type_id._id : "";
 
-          let isOcc = r.status === "occupied";
-          let bg = isOcc
-            ? "bg-red-50 text-red-700"
-            : "bg-emerald-50 text-emerald-700";
+          let dot = isOccupied
+            ? '<span class="absolute top-3 right-3 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span></span>'
+            : "";
+          let onclick = isOccupied
+            ? `showToast('បន្ទប់នេះកំពុងមានភ្ញៀវ!', 'error')`
+            : `gotoBooking('${r._id}')`;
+
           grid.innerHTML += `
-                <div class="border-2 rounded-2xl p-5 relative group ${bg}">
-                    <div class="absolute top-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                        <button onclick="openEditRoom('${r._id}', '${r.room_number}', '${r.type_id?._id}', '${r.price}')" class="bg-white text-blue-500 rounded p-1 shadow text-xs">✏️</button>
-                        <button onclick="deleteRoom('${r._id}')" class="bg-white text-red-500 rounded p-1 shadow text-xs">🗑️</button>
+                <div onclick="${onclick}" class="border-2 rounded-2xl p-5 flex flex-col items-center justify-center relative transition transform group shadow-sm hover:shadow-md ${bg}">
+                    <div class="absolute top-2 left-2 flex gap-1 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="event.stopPropagation(); openEditRoomModal('${r._id}','${r.room_number}','${typeId}','${r.price}')" class="bg-white text-blue-500 hover:text-blue-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">✏️</button>
+                        <button onclick="event.stopPropagation(); deleteRoom('${r._id}')" class="bg-white text-red-500 hover:text-red-700 w-7 h-7 rounded-lg shadow flex items-center justify-center text-xs">🗑️</button>
                     </div>
-                    <div class="text-center mt-2">
-                        <div class="text-2xl font-black">${r.room_number}</div>
-                        <div class="text-[10px] uppercase font-bold">${r.type_id?.type_name || "N/A"}</div>
-                    </div>
+                    ${dot}
+                    <span class="text-2xl font-black tracking-tight">${r.room_number}</span>
+                    <span class="text-[9px] font-bold uppercase mt-2 px-2 py-1 bg-white/50 rounded-lg">${typeName} <span class="text-slate-400">($${r.price})</span></span>
                 </div>`;
         });
+      }
 
-        // Bookings (Guestlist)
-        let gBody = document.getElementById("guestTableBody");
-        gBody.innerHTML = "";
-        state.bookings.forEach((b) => {
-          let shortId = b._id.slice(-6).toUpperCase(); // Short ID for Barcode
-          let code = `BK-${shortId}-${b.room_id.room_number}`;
-          let bData = encodeURIComponent(
-            JSON.stringify({ ...b, shortId: code }),
-          ); // Pass code
+      // Render Guest List Table
+      function renderGuestList() {
+        const tbody = document.getElementById("guestTableBody");
+        const bRoomSelect = document.getElementById("edit_b_room");
+        tbody.innerHTML = "";
+        bRoomSelect.innerHTML = "";
 
-          let actionBtns = `<button onclick="showTicketModal('${bData}')" class="mx-1 text-slate-400">🎫</button>`;
-          if (b.status === "booked")
-            actionBtns += `<button onclick="updateBooking('${b._id}', '${b.room_id._id}', 'checked_in')" class="mx-1 text-emerald-500">📥</button>`;
-          else if (b.status === "checked_in")
-            actionBtns += `<button onclick="updateBooking('${b._id}', '${b.room_id._id}', 'checked_out')" class="mx-1 text-amber-500">📤</button>`;
-          actionBtns += `<button onclick="openEditBooking('${b._id}', '${b.tenant_name}', '${b.tenant_phone}', '${b.room_id._id}')" class="mx-1 text-blue-500">✏️</button>`;
-          actionBtns += `<button onclick="deleteBooking('${b._id}')" class="mx-1 text-red-500">🗑️</button>`;
+        // Populate room select for Edit Booking Modal
+        [...state.rooms]
+          .sort((a, b) => a.room_number.localeCompare(b.room_number))
+          .forEach((r) => {
+            bRoomSelect.innerHTML += `<option value="${r._id}">Room ${r.room_number}</option>`;
+          });
 
-          let payBadg =
-            b.payment_status === "paid"
-              ? '<span class="text-emerald-500 text-xs font-bold">Paid</span>'
-              : '<span class="text-red-500 text-xs font-bold">Unpaid</span>';
+        state.bookings.forEach((row) => {
+          let roomNum = row.room_id ? row.room_id.room_number : "N/A";
+          let roomId = row.room_id ? row.room_id._id : "";
+          let searchCode = formatBarcode(row._id, roomNum);
+          let inTime = formatDate(row.check_in_time);
+          let outTime = formatDate(row.check_out_time);
 
-          gBody.innerHTML += `
-                <tr class="border-b border-slate-100">
-                    <td class="py-3 px-6"><div class="font-bold">Room ${b.room_id.room_number}</div><div class="text-[10px] text-blue-500">${code}</div></td>
-                    <td class="py-3 px-6"><div class="font-bold text-sm">${b.tenant_name}</div><div class="text-xs text-slate-500">${b.tenant_phone}</div></td>
-                    <td class="py-3 px-6 text-[10px]"><div class="text-emerald-600">IN: ${b.check_in_time.slice(0, 10)}</div><div class="text-amber-600">OUT: ${b.check_out_time.slice(0, 10)}</div></td>
-                    <td class="py-3 px-6">${payBadg}</td>
-                    <td class="py-3 px-6"><span class="bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase rounded">${b.status}</span></td>
-                    <td class="py-3 px-6 text-right">${actionBtns}</td>
+          let payBadge =
+            row.payment_status === "paid"
+              ? `<span class="text-emerald-600 text-[11px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Paid</span>`
+              : `<span class="text-red-500 text-[11px] font-bold flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg> Unpaid</span>`;
+
+          if (row.payment_status === "unpaid") {
+            payBadge += `<br><a href="/paymentadmin.html?id=${row._id}" class="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-200 px-2 py-1 rounded inline-block mt-1 hover:bg-blue-100 transition">🔄 Pay Now</a>`;
+          }
+
+          let statusBadge = "";
+          if (row.status === "checked_in")
+            statusBadge =
+              '<span class="bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase">Active</span>';
+          else if (row.status === "booked")
+            statusBadge =
+              '<span class="bg-amber-50 text-amber-600 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase">Booked</span>';
+          else if (row.status === "pending")
+            statusBadge =
+              '<span class="bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase">Pending</span>';
+          else
+            statusBadge =
+              '<span class="bg-slate-50 text-slate-500 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase">Finished</span>';
+
+          let bData = encodeURIComponent(JSON.stringify(row));
+
+          let actionBtns = `<button onclick="showTicketModal('${bData}')" class="p-1.5 text-slate-400 hover:text-blue-500 bg-slate-50 hover:bg-blue-50 rounded transition" title="View Ticket">🎫</button>`;
+          if (row.status === "booked") {
+            actionBtns += `<button onclick="updateBookingStatus('${row._id}', '${roomId}', 'checked_in')" class="p-1.5 inline-block text-emerald-500 bg-emerald-50 hover:bg-emerald-100 rounded ml-1 transition" title="Check In">📥</button>`;
+          } else if (row.status === "checked_in") {
+            actionBtns += `<button onclick="updateBookingStatus('${row._id}', '${roomId}', 'checked_out')" class="p-1.5 inline-block text-amber-500 bg-amber-50 hover:bg-amber-100 rounded ml-1 transition" title="Check Out">📤</button>`;
+          }
+
+          actionBtns += `<button onclick="openEditBookingModal('${row._id}','${row.tenant_name}','${row.tenant_phone}','${roomId}')" class="p-1.5 text-blue-500 bg-blue-50 hover:bg-blue-100 rounded ml-1 transition" title="Edit">✏️</button>`;
+          actionBtns += `<button onclick="deleteBooking('${row._id}')" class="p-1.5 inline-block text-red-500 bg-red-50 hover:bg-red-100 rounded ml-1 transition" title="Delete">🗑️</button>`;
+
+          tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100 last:border-0">
+                    <td class="px-6 py-4"><div class="font-black text-slate-800 text-sm">Room ${roomNum}</div><div class="text-[10px] text-blue-500 font-mono font-bold mt-1">${searchCode}</div></td>
+                    <td class="px-6 py-4"><div class="font-bold text-sm text-slate-800">${row.tenant_name}</div><div class="text-slate-500 text-[11px] mt-1">${row.tenant_phone}</div></td>
+                    <td class="px-6 py-4 text-[11px] font-semibold text-slate-600"><div class="text-emerald-600 mb-1">IN: ${inTime}</div><div class="text-amber-600">OUT: ${outTime}</div></td>
+                    <td class="px-6 py-4">${payBadge}</td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-right">${actionBtns}</td>
                 </tr>`;
         });
       }
 
-      // Custom Confirm Logic
-      let confirmCb = null;
-      function confirmDialog(title, text, cb) {
-        document.getElementById("confirmTitle").innerText = title;
-        document.getElementById("confirmText").innerText = text;
-        confirmCb = cb;
-        document
-          .getElementById("customConfirmModal")
-          .classList.remove("opacity-0", "pointer-events-none");
-        setTimeout(() => {
-          document.getElementById("confirmBox").classList.remove("scale-95");
-        }, 10);
-      }
-      document.getElementById("confirmBtn").addEventListener("click", () => {
-        if (confirmCb) confirmCb();
-        closeConfirm();
-      });
-      function closeConfirm() {
-        document.getElementById("confirmBox").classList.add("scale-95");
-        setTimeout(
-          () =>
-            document
-              .getElementById("customConfirmModal")
-              .classList.add("opacity-0", "pointer-events-none"),
-          200,
-        );
+      // --- Booking Form Validation ---
+      function renderRoomSelect() {
+        const select = document.getElementById("roomSelect");
+        select.innerHTML =
+          '<option value="" disabled selected>-- ចុចជ្រើសរើសបន្ទប់ --</option>';
+        [...state.rooms]
+          .sort((a, b) => a.room_number.localeCompare(b.room_number))
+          .forEach((r) => {
+            if (r.status === "available") {
+              let typeName = r.type_id ? r.type_id.type_name : "";
+              select.innerHTML += `<option value="${r._id}" data-price="${r.price}">🚪 បន្ទប់ ${r.room_number} • ${typeName} • ($${r.price}/ថ្ងៃ)</option>`;
+            }
+          });
       }
 
-      function showToast(msg, type = "success") {
-        let t = document.getElementById("toastAlert");
-        document.getElementById("toastMsg").innerText = msg;
-        t.className = `fixed top-6 right-6 z-[200] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-500 transform text-white ${type === "error" ? "bg-red-600" : "bg-[#10B981]"}`;
-        t.classList.add("toast-show");
-        setTimeout(() => t.classList.remove("toast-show"), 3000);
+      let activeBookingsData = [];
+      async function fetchBookedSlots() {
+        let roomId = document.getElementById("roomSelect").value;
+        let box = document.getElementById("liveStatusBox");
+        let container = document.getElementById("slotsContainer");
+        if (!roomId) return;
+        try {
+          let res = await fetch(`/api/bookings/check_availability/${roomId}`);
+          activeBookingsData = await res.json();
+          container.innerHTML = "";
+          if (activeBookingsData.length > 0) {
+            box.classList.remove("hidden");
+            activeBookingsData.forEach((s) => {
+              let tin = formatDate(s.check_in_time);
+              let tout = formatDate(s.check_out_time);
+              container.innerHTML += `<span class="slot-tag">${tin} ➔ ${tout}</span>`;
+            });
+          } else {
+            box.classList.add("hidden");
+          }
+          validateLiveDates();
+        } catch (err) {
+          console.error(err);
+        }
       }
 
-      // CRUD Endpoints (Assumes PUT endpoints are added to server.js)
-      async function addType(e) {
-        e.preventDefault();
-        await fetch("/api/room-types", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type_name: document.getElementById("new_type_name").value,
-          }),
-        });
-        e.target.reset();
-        loadData();
-        showToast("បញ្ចូលជោគជ័យ");
+      function updateSubmitButton() {
+        let status = document.getElementById("paymentStatus").value;
+        let btn = document.getElementById("submitBookBtn");
+        if (status === "unpaid") {
+          btn.innerHTML = "បន្តទៅកាន់ម៉ាស៊ីន POS (Pay Now) 💳";
+          btn.className =
+            "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2";
+        } else {
+          btn.innerHTML = "រក្សាទុកការកក់ (Save Booking) ✅";
+          btn.className =
+            "w-full bg-[#0B1120] hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 text-base flex justify-center items-center gap-2";
+        }
+        validateLiveDates();
       }
-      async function addRoom(e) {
-        e.preventDefault();
-        await fetch("/api/rooms", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            room_number: document.getElementById("new_room_number").value,
-            price: document.getElementById("new_room_price").value,
-            type_id: document.getElementById("new_room_type").value,
-          }),
-        });
-        e.target.reset();
-        loadData();
-        showToast("បញ្ចូលជោគជ័យ");
+
+      function validateLiveDates() {
+        let inInput = document.getElementById("checkInInput");
+        let outInput = document.getElementById("checkOutInput");
+        let checkIn = inInput.value;
+        let checkOut = outInput.value;
+        let err = document.getElementById("liveErrorBanner");
+        let btn = document.getElementById("submitBookBtn");
+
+        if (checkIn) {
+          outInput.min = checkIn;
+          let inDate = new Date(checkIn);
+          let outDate = new Date(checkOut);
+          if (!checkOut || outDate <= inDate) {
+            let nextDay = new Date(inDate.getTime() + 24 * 60 * 60 * 1000);
+            outInput.value = new Date(
+              nextDay.getTime() - nextDay.getTimezoneOffset() * 60000,
+            )
+              .toISOString()
+              .slice(0, 16);
+            checkOut = outInput.value;
+          }
+        }
+
+        if (!checkIn || !checkOut) {
+          err.classList.add("hidden");
+          err.classList.remove("flex");
+          btn.disabled = false;
+          btn.classList.remove("opacity-50");
+        } else {
+          let isOverlapping = activeBookingsData.some((b) => {
+            let bIn = new Date(b.check_in_time);
+            let bOut = new Date(b.check_out_time);
+            let myIn = new Date(checkIn);
+            let myOut = new Date(checkOut);
+            return myIn < bOut && myOut > bIn;
+          });
+          if (isOverlapping) {
+            err.classList.remove("hidden");
+            err.classList.add("flex");
+            btn.disabled = true;
+            btn.classList.add("opacity-50");
+          } else {
+            err.classList.add("hidden");
+            err.classList.remove("flex");
+            btn.disabled = false;
+            btn.classList.remove("opacity-50");
+          }
+        }
+
+        let roomSelect = document.getElementById("roomSelect");
+        let note = document.getElementById("paymentNote");
+        if (roomSelect.value && checkIn && checkOut && !btn.disabled) {
+          let opt = roomSelect.options[roomSelect.selectedIndex];
+          let price = parseFloat(opt.getAttribute("data-price"));
+          let hours = Math.abs(new Date(checkOut) - new Date(checkIn)) / 36e5;
+          if (hours > 0) {
+            let total = (hours / 24) * price;
+            note.innerHTML = `<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg shadow-sm">⏱️</div><div class="flex flex-col"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Duration</span><span class="text-slate-800 font-black text-sm">${hours.toFixed(0)} ម៉ោង</span></div></div>
+                    <div class="flex items-center gap-4 mt-3 md:mt-0 md:border-l md:border-slate-200 md:pl-6"><div class="flex flex-col md:text-right"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total</span><span class="text-xl md:text-2xl font-black text-blue-600">$${total.toFixed(2)}</span></div></div>`;
+          }
+        }
       }
+
       async function submitBooking(e) {
         e.preventDefault();
-        await fetch("/api/bookings/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            room_id: document.getElementById("roomSelect").value,
-            tenant_name: document.getElementById("tenant_name").value,
-            tenant_phone: document.getElementById("tenant_phone").value,
-            check_in_time: document.getElementById("checkInInput").value,
-            check_out_time: document.getElementById("checkOutInput").value,
-            payment_method: "cash",
-            payment_status: document.getElementById("paymentStatus").value,
-            status: document.getElementById("bookingStatus").value,
-          }),
-        });
-        e.target.reset();
-        loadData();
-        showToast("កក់ជោគជ័យ");
-        switchTab("guestlist");
+        const btn = document.getElementById("submitBookBtn");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "កំពុងដំណើរការ...";
+        btn.disabled = true;
+
+        const payload = {
+          room_id: document.getElementById("roomSelect").value,
+          user_id: null,
+          tenant_name: document.getElementById("tenant_name").value,
+          tenant_phone: document.getElementById("tenant_phone").value,
+          check_in_time: document.getElementById("checkInInput").value,
+          check_out_time: document.getElementById("checkOutInput").value,
+          payment_method: document.getElementById("paymentMethod").value,
+          payment_status: document.getElementById("paymentStatus").value,
+          status: document.getElementById("bookingStatus").value,
+        };
+
+        try {
+          let res = await fetch("/api/bookings/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          let data = await res.json();
+          if (data.success) {
+            if (payload.payment_status === "unpaid")
+              window.location.href = `/paymentadmin.html?id=${data.bookingId}`;
+            else {
+              showToast("✅ ការកក់ជោគជ័យ!", "success");
+              document.getElementById("adminBookingForm").reset();
+              updateSubmitButton();
+              loadData();
+              switchTab("overview");
+            }
+          } else showToast(data.message, "error");
+        } catch (err) {
+          showToast("បរាជ័យក្នុងការភ្ជាប់ Server", "error");
+        }
+        btn.innerHTML = originalText;
+        btn.disabled = false;
       }
 
+      // --- CRUD Operations API (Optimistic Updates or fetch depending on backend support) ---
+      // Types
+      async function addType(e) {
+        e.preventDefault();
+        const name = document.getElementById("new_type_name").value;
+        try {
+          await fetch("/api/room-types", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type_name: name }),
+          });
+          document.getElementById("new_type_name").value = "";
+          showToast("បានបញ្ចូលប្រភេទបន្ទប់ថ្មី!", "success");
+          loadData();
+        } catch (err) {
+          showToast("មានបញ្ហាក្នុងការរក្សាទុក", "error");
+        }
+      }
       function deleteType(id) {
         confirmDialog(
-          "លុបប្រភេទ",
-          "តើអ្នកចង់លុបប្រភេទបន្ទប់នេះមែនទេ?",
+          "លុបប្រភេទបន្ទប់",
+          "តើអ្នកពិតជាចង់លុបប្រភេទនេះមែនទេ?",
           async () => {
             await fetch(`/api/room-types/${id}`, { method: "DELETE" });
+            showToast("បានលុបប្រភេទបន្ទប់!", "success");
             loadData();
-            showToast("លុបជោគជ័យ");
           },
+          "delete",
         );
+      }
+      async function submitEditType(e) {
+        e.preventDefault();
+        const id = document.getElementById("edit_type_id").value;
+        const name = document.getElementById("edit_type_name").value;
+        /* Note: Server.js might not have PUT /api/room-types/:id, we use fallback */
+        try {
+          await fetch(`/api/room-types/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type_name: name }),
+          });
+          showToast("កែប្រែជោគជ័យ!", "success");
+          closeEditModals();
+          loadData();
+        } catch (e) {
+          showToast("Backend មិនទាន់ Support ការ Update ទេ", "error");
+          closeEditModals();
+        }
+      }
+
+      // Rooms
+      async function addRoom(e) {
+        e.preventDefault();
+        const payload = {
+          room_number: document.getElementById("new_room_number").value,
+          price: document.getElementById("new_room_price").value,
+          type_id: document.getElementById("new_room_type").value,
+        };
+        try {
+          await fetch("/api/rooms", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          e.target.reset();
+          showToast("បានបញ្ចូលបន្ទប់ថ្មី!", "success");
+          loadData();
+        } catch (err) {
+          showToast("មានបញ្ហាក្នុងការរក្សាទុក", "error");
+        }
       }
       function deleteRoom(id) {
-        confirmDialog("លុបបន្ទប់", "តើអ្នកចង់លុបបន្ទប់នេះមែនទេ?", async () => {
-          await fetch(`/api/rooms/${id}`, { method: "DELETE" });
-          loadData();
-          showToast("លុបជោគជ័យ");
-        });
-      }
-      function deleteBooking(id) {
         confirmDialog(
-          "លុបប្រវត្តិ",
-          "តើអ្នកចង់លុបការកក់នេះមែនទេ?",
+          "លុបបន្ទប់",
+          "តើអ្នកពិតជាចង់លុបបន្ទប់នេះមែនទេ? ប្រវត្តិការជួលអាចនឹងបាត់។",
           async () => {
-            await fetch(`/api/bookings/${id}`, { method: "DELETE" });
+            await fetch(`/api/rooms/${id}`, { method: "DELETE" });
+            showToast("បានលុបបន្ទប់!", "success");
             loadData();
-            showToast("លុបជោគជ័យ");
           },
+          "delete",
         );
       }
-      function updateBooking(id, room_id, status) {
+      async function submitEditRoom(e) {
+        e.preventDefault();
+        const id = document.getElementById("edit_room_id").value;
+        const payload = {
+          room_number: document.getElementById("edit_room_number").value,
+          type_id: document.getElementById("edit_type_id_select").value,
+          price: document.getElementById("edit_price").value,
+        };
+        try {
+          await fetch(`/api/rooms/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          showToast("កែប្រែជោគជ័យ!", "success");
+          closeEditModals();
+          loadData();
+        } catch (e) {
+          showToast("Backend មិនទាន់ Support ការ Update ទេ", "error");
+          closeEditModals();
+        }
+      }
+
+      // Bookings (Edit & Delete & Status)
+      function deleteBooking(id) {
         confirmDialog(
-          "ប្តូរស្ថានភាព",
-          "តើអ្នកចង់ប្តូរស្ថានភាពភ្ញៀវនេះមែនទេ?",
+          "លុបទិន្នន័យភ្ញៀវ",
+          "តើអ្នកពិតជាចង់លុបការកក់នេះមែនទេ?",
+          async () => {
+            await fetch(`/api/bookings/${id}`, { method: "DELETE" });
+            showToast("បានលុបទិន្នន័យ!", "success");
+            loadData();
+          },
+          "delete",
+        );
+      }
+      function updateBookingStatus(id, room_id, status) {
+        let title =
+          status === "checked_in" ? "Check-In ភ្ញៀវ" : "Check-Out ភ្ញៀវ";
+        let text =
+          status === "checked_in"
+            ? "តើអ្នកចង់ Check-In ភ្ញៀវនេះមែនទេ?"
+            : "ភ្ញៀវចេញពីបន្ទប់ បន្ទប់នឹងទំនេរវិញ។";
+        confirmDialog(
+          title,
+          text,
           async () => {
             await fetch(`/api/bookings/${id}/status`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ status, room_id }),
             });
+            showToast("បច្ចុប្បន្នភាពជោគជ័យ!", "success");
             loadData();
-            showToast("ជោគជ័យ");
           },
+          "status",
         );
+      }
+      async function submitEditBooking(e) {
+        e.preventDefault();
+        const id = document.getElementById("edit_b_id").value;
+        const payload = {
+          tenant_name: document.getElementById("edit_b_name").value,
+          tenant_phone: document.getElementById("edit_b_phone").value,
+          room_id: document.getElementById("edit_b_room").value,
+        };
+        try {
+          await fetch(`/api/bookings/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          showToast("កែប្រែជោគជ័យ!", "success");
+          closeEditModals();
+          loadData();
+        } catch (e) {
+          showToast("Backend មិនទាន់ Support ការ Update ទេ", "error");
+          closeEditModals();
+        }
       }
 
-      // EDIT Modals
-      function openEditModal(modalId, boxId) {
-        document
-          .getElementById(modalId)
-          .classList.remove("opacity-0", "pointer-events-none");
-        setTimeout(
-          () => document.getElementById(boxId).classList.remove("scale-95"),
-          10,
-        );
-      }
-      function closeEditModal(modalId, boxId) {
-        document.getElementById(boxId).classList.add("scale-95");
-        setTimeout(
-          () =>
-            document
-              .getElementById(modalId)
-              .classList.add("opacity-0", "pointer-events-none"),
-          200,
-        );
-      }
-
-      function openEditType(id, name) {
+      // Modals Management
+      function openEditTypeModal(id, name) {
         document.getElementById("edit_type_id").value = id;
         document.getElementById("edit_type_name").value = name;
-        openEditModal("editTypeModal", "editTypeBox");
+        document
+          .getElementById("editTypeModal")
+          .classList.remove("opacity-0", "pointer-events-none");
       }
-      async function saveEditType() {
-        await fetch(
-          `/api/room-types/${document.getElementById("edit_type_id").value}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              type_name: document.getElementById("edit_type_name").value,
-            }),
-          },
-        );
-        closeEditModal("editTypeModal", "editTypeBox");
-        loadData();
-        showToast("កែប្រែជោគជ័យ");
-      }
-
-      function openEditRoom(id, num, typeId, price) {
+      function openEditRoomModal(id, num, typeId, price) {
         document.getElementById("edit_room_id").value = id;
         document.getElementById("edit_room_number").value = num;
-        document.getElementById("edit_room_type").value = typeId;
-        document.getElementById("edit_room_price").value = price;
-        openEditModal("editRoomModal", "editRoomBox");
+        document.getElementById("edit_type_id_select").value = typeId;
+        document.getElementById("edit_price").value = price;
+        document
+          .getElementById("editRoomModal")
+          .classList.remove("opacity-0", "pointer-events-none");
       }
-      async function saveEditRoom() {
-        await fetch(
-          `/api/rooms/${document.getElementById("edit_room_id").value}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              room_number: document.getElementById("edit_room_number").value,
-              type_id: document.getElementById("edit_room_type").value,
-              price: document.getElementById("edit_room_price").value,
-            }),
-          },
-        );
-        closeEditModal("editRoomModal", "editRoomBox");
-        loadData();
-        showToast("កែប្រែជោគជ័យ");
-      }
-
-      function openEditBooking(id, name, phone, roomId) {
-        document.getElementById("edit_booking_id").value = id;
+      function openEditBookingModal(id, name, phone, roomId) {
+        document.getElementById("edit_b_id").value = id;
         document.getElementById("edit_b_name").value = name;
         document.getElementById("edit_b_phone").value = phone;
         document.getElementById("edit_b_room").value = roomId;
-        openEditModal("editBookingModal", "editBookingBox");
+        document
+          .getElementById("editBookingModal")
+          .classList.remove("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document
+            .getElementById("editBookingBox")
+            .classList.remove("scale-95");
+        }, 10);
       }
-      async function saveEditBooking() {
-        await fetch(
-          `/api/bookings/${document.getElementById("edit_booking_id").value}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              tenant_name: document.getElementById("edit_b_name").value,
-              tenant_phone: document.getElementById("edit_b_phone").value,
-              room_id: document.getElementById("edit_b_room").value,
-            }),
-          },
-        );
-        closeEditModal("editBookingModal", "editBookingBox");
-        loadData();
-        showToast("កែប្រែជោគជ័យ");
+      function closeEditModals() {
+        document
+          .getElementById("editTypeModal")
+          .classList.add("opacity-0", "pointer-events-none");
+        document
+          .getElementById("editRoomModal")
+          .classList.add("opacity-0", "pointer-events-none");
+        document.getElementById("editBookingBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("editBookingModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 200);
       }
 
-      // Scanner & Tickets
-      function showTicketModal(encB) {
-        let b = JSON.parse(decodeURIComponent(encB));
-        let html = `<div class="bg-white flex w-full shadow-xl border border-slate-200">
-                <div class="flex-[2.8] p-8 border-r-2 border-dashed">
-                    <h1 class="text-xl font-bold bg-[#E11D48] text-white px-4 py-2 inline-block">BOOKING TICKET</h1>
-                    <div class="mt-6 flex justify-between">
-                        <div><div class="text-[10px] text-slate-400">GUEST</div><div class="font-black text-lg">${b.tenant_name}</div></div>
-                        <div class="text-right"><div class="text-[10px] text-slate-400">ROOM</div><div class="text-3xl text-red-500 font-black">${b.room_id.room_number}</div></div>
+      // --- Ticket Modal & Scanner ---
+      function generateTicketHTML(b) {
+        const isCheckedIn = b.status === "checked_in";
+        const bgColor = isCheckedIn ? "bg-[#3B82F6]" : "bg-[#E11D48]";
+        const roomNum = b.room_id ? b.room_id.room_number : "N/A";
+        const dataCode = formatBarcode(b._id, roomNum);
+        const roomType =
+          b.room_id && b.room_id.type_id
+            ? b.room_id.type_id.type_name
+            : "Standard";
+        const inTime = formatDate(b.check_in_time);
+        const outTime = formatDate(b.check_out_time);
+
+        return `
+            <div class="bg-white rounded-[16px] overflow-hidden flex flex-col md:flex-row w-full shadow-2xl border border-slate-200 relative">
+                <div class="flex-[2.8] relative bg-white border-b-2 md:border-b-0 md:border-r-2 border-dashed border-slate-300 z-10">
+                    <div class="${bgColor} text-white px-6 md:px-8 py-4 flex justify-between items-center">
+                        <h1 class="text-base md:text-xl tracking-widest font-bold flex items-center gap-2">BOOKING TICKET</h1>
+                        <span class="text-[11px] font-bold tracking-widest bg-white/20 px-3 py-1 rounded-full">ADMIN</span>
                     </div>
-                    <svg id="bp_barcode" class="mt-6"></svg>
+                    <div class="p-6 md:p-8 relative">
+                        <div class="flex justify-between mb-6 relative z-10">
+                            <div><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">NAME OF GUEST</div><div class="text-base md:text-lg font-black text-slate-900 uppercase">${b.tenant_name}</div></div>
+                            <div class="text-right"><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">PHONE NUMBER</div><div class="text-sm md:text-base font-bold text-slate-900">${b.tenant_phone}</div></div>
+                        </div>
+                        <div class="flex justify-between relative z-10">
+                            <div><div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">ROOM NO.</div><div class="text-[32px] md:text-[40px] font-black ${isCheckedIn ? "text-[#3B82F6]" : "text-[#E11D48]"} leading-none mt-1">${roomNum}</div><div class="text-[10px] md:text-[11px] font-bold text-slate-500 mt-2 bg-slate-100 inline-block px-2 py-1 rounded">${roomType}</div></div>
+                            <div class="text-right">
+                                <div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest">CHECK-IN</div><div class="text-sm md:text-[15px] font-bold text-slate-900">${inTime}</div>
+                                <div class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest mt-3">CHECK-OUT</div><div class="text-sm md:text-[15px] font-bold text-slate-900">${outTime}</div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t-2 border-slate-100 flex justify-between items-center relative z-10">
+                            <svg class="barcode-target" data-value="${dataCode}"></svg>
+                            <div class="text-[9px] md:text-[10px] text-slate-400 font-bold">Powered by U-Rental</div>
+                        </div>
+                    </div>
                 </div>
+                <div class="flex-[1.2] relative bg-slate-50 z-10 flex flex-col md:block">
+                    <div class="bg-[#0B1120] text-white px-6 py-4 text-center hidden md:block"><h1 class="text-base font-bold tracking-widest">TICKET</h1></div>
+                    <div class="p-6 text-center flex-1 flex flex-col justify-center items-center">
+                        <div class="text-[10px] text-slate-400 font-bold tracking-widest hidden md:block">BOARDING ROOM</div>
+                        <div class="text-[24px] md:text-[32px] font-black text-slate-900 mt-1 hidden md:block">${roomNum}</div>
+                        <div class="bg-white inline-block p-2 border-2 border-slate-200 rounded-xl md:mt-6 shadow-sm"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(dataCode)}" alt="QR" class="w-[100px] md:w-[120px]"></div>
+                        <div class="text-[9px] text-slate-400 font-bold mt-3 tracking-widest text-emerald-600">SHOW AT COUNTER</div>
+                    </div>
+                </div>
+                <div class="hidden md:block absolute top-[60px] left-[70%] w-[34px] h-[34px] bg-slate-50 border border-slate-200 rounded-full transform -translate-x-1/2 z-20"></div>
+                <div class="hidden md:block absolute bottom-[60px] left-[70%] w-[34px] h-[34px] bg-slate-50 border border-slate-200 rounded-full transform -translate-x-1/2 z-20"></div>
             </div>`;
-        document.getElementById("bpContentContainer").innerHTML = html;
-        setTimeout(
-          () =>
-            JsBarcode("#bp_barcode", b.shortId, {
-              width: 1.5,
-              height: 40,
-              fontSize: 12,
-            }),
-          100,
-        );
+      }
+
+      function showTicketModal(encodedData) {
+        let b = JSON.parse(decodeURIComponent(encodedData));
+        const container = document.getElementById("bpContentContainer");
+        container.innerHTML = generateTicketHTML(b);
+
+        setTimeout(() => {
+          let svg = container.querySelector(".barcode-target");
+          if (svg) {
+            let val = svg.getAttribute("data-value");
+            let bw = window.innerWidth < 768 ? 1.2 : 1.5;
+            JsBarcode(svg, val, {
+              format: "CODE128",
+              width: bw,
+              height: 35,
+              displayValue: true,
+              fontSize: 11,
+              margin: 0,
+              lineColor: "#0F172A",
+            });
+          }
+        }, 100);
+
         document
           .getElementById("boardingPassModal")
           .classList.remove("opacity-0", "pointer-events-none");
-      }
-      function closeBoardingPass() {
-        document
-          .getElementById("boardingPassModal")
-          .classList.add("opacity-0", "pointer-events-none");
+        setTimeout(() => {
+          document.getElementById("bpBox").classList.remove("scale-95");
+        }, 10);
       }
 
-      let scanner;
+      function closeBoardingPass() {
+        document.getElementById("bpBox").classList.add("scale-95");
+        setTimeout(() => {
+          document
+            .getElementById("boardingPassModal")
+            .classList.add("opacity-0", "pointer-events-none");
+          document.getElementById("bpContentContainer").innerHTML = "";
+        }, 300);
+      }
+
+      let html5QrcodeScanner;
       function openScanner() {
         document
           .getElementById("scannerModal")
           .classList.remove("opacity-0", "pointer-events-none");
-        setTimeout(
-          () =>
-            document.getElementById("scannerBox").classList.remove("scale-95"),
-          10,
-        );
-        scanner = new Html5QrcodeScanner(
+        setTimeout(() => {
+          document.getElementById("scannerBox").classList.remove("scale-95");
+        }, 10);
+
+        html5QrcodeScanner = new Html5QrcodeScanner(
           "reader",
-          { fps: 10, qrbox: { width: 250, height: 250 } },
+          { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
           false,
         );
-        scanner.render(
-          (text) => {
+        html5QrcodeScanner.render(
+          async (text) => {
             closeScanner();
-            let parts = text.split("-");
-            if (parts[0] === "BK") {
-              let shortId = parts[1];
+            showToast("កំពុងស្វែងរកទិន្នន័យ...", "success");
+
+            let parts = text.trim().split("-");
+            if (parts.length >= 2 && parts[0] === "BK") {
+              let shortId = parts[1]; // We check using endsWith since ID is now short
               let found = state.bookings.find(
-                (x) => x._id.slice(-6).toUpperCase() === shortId,
+                (x) => formatShortId(x._id) === shortId,
               );
               if (found)
-                showTicketModal(
-                  encodeURIComponent(
-                    JSON.stringify({ ...found, shortId: text }),
-                  ),
-                );
-              else showToast("រកមិនឃើញសំបុត្រទេ!", "error");
+                showTicketModal(encodeURIComponent(JSON.stringify(found)));
+              else showToast("រកមិនឃើញសំបុត្រនេះក្នុងប្រព័ន្ធទេ!", "error");
+            } else {
+              showToast("QR Code មិនត្រឹមត្រូវទេ", "error");
             }
           },
           () => {},
         );
       }
+
       function closeScanner() {
-        if (scanner) scanner.clear();
+        if (html5QrcodeScanner) html5QrcodeScanner.clear();
         document.getElementById("scannerBox").classList.add("scale-95");
-        setTimeout(
-          () =>
-            document
-              .getElementById("scannerModal")
-              .classList.add("opacity-0", "pointer-events-none"),
-          200,
-        );
+        setTimeout(() => {
+          document
+            .getElementById("scannerModal")
+            .classList.add("opacity-0", "pointer-events-none");
+        }, 300);
       }
 
       function searchTable() {
         let input = document.getElementById("searchInput").value.toLowerCase();
-        document
-          .querySelectorAll("#guestTableBody tr")
-          .forEach(
-            (r) =>
-              (r.style.display = r.innerText.toLowerCase().includes(input)
-                ? ""
-                : "none"),
-          );
+        document.querySelectorAll("#guestTableBody tr").forEach((r) => {
+          r.style.display = r.innerText.toLowerCase().includes(input)
+            ? ""
+            : "none";
+        });
       }
 
+      // Init Chart
+      let bookingChartInstance = null;
+      function initChart() {
+        const chartCanvas = document.getElementById("realBookingChart");
+        if (!chartCanvas || chartCanvas.offsetParent === null) return;
+        const ctx = chartCanvas.getContext("2d");
+        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(59, 130, 246, 0.4)");
+        gradient.addColorStop(1, "rgba(59, 130, 246, 0.0)");
+        if (bookingChartInstance) bookingChartInstance.destroy();
+        bookingChartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: state.stats.chart_labels || [],
+            datasets: [
+              {
+                label: "Bookings",
+                data: state.stats.chart_data || [],
+                borderColor: "#3B82F6",
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointBackgroundColor: "#fff",
+                pointBorderColor: "#3B82F6",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                suggestedMax: 5,
+                border: { display: false },
+                grid: { color: "#f1f5f9" },
+              },
+              x: { border: { display: false }, grid: { display: false } },
+            },
+          },
+        });
+      }
+
+      // Init App
       document.addEventListener("DOMContentLoaded", () => {
         switchTab("overview");
         loadData();
+        setInterval(loadData, 10000); // Live Sync
       });
     </script>
   </body>

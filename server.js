@@ -209,6 +209,18 @@ app.post("/api/room-types", async (req, res) => {
   }
 });
 
+// 🟢 កែប្រែប្រភេទបន្ទប់ (Edit Room Type)
+app.put("/api/room-types/:id", async (req, res) => {
+  try {
+    await RoomType.findByIdAndUpdate(req.params.id, {
+      type_name: req.body.type_name,
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // លុបប្រភេទបន្ទប់
 app.delete("/api/room-types/:id", async (req, res) => {
   try {
@@ -236,6 +248,21 @@ app.post("/api/rooms", async (req, res) => {
   try {
     const newRoom = new Room(req.body);
     await newRoom.save();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// 🟢 កែប្រែបន្ទប់ (Edit Room)
+app.put("/api/rooms/:id", async (req, res) => {
+  try {
+    const { room_number, type_id, price } = req.body;
+    await Room.findByIdAndUpdate(req.params.id, {
+      room_number,
+      type_id,
+      price,
+    });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -364,6 +391,21 @@ app.put("/api/bookings/:id/status", async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false });
+  }
+});
+
+// 🟢 កែប្រែព័ត៌មានភ្ញៀវ និងបន្ទប់កក់ (Edit Booking)
+app.put("/api/bookings/:id", async (req, res) => {
+  try {
+    const { tenant_name, tenant_phone, room_id } = req.body;
+    await Booking.findByIdAndUpdate(req.params.id, {
+      tenant_name,
+      tenant_phone,
+      room_id,
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
