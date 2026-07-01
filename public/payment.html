@@ -49,19 +49,40 @@
           transform: translateY(0);
         }
       }
-
-      /* Card UI Style */
       .credit-card-input {
         background: url("https://cdn-icons-png.flaticon.com/512/25/25234.png")
           no-repeat;
         background-size: 24px;
         background-position: 96% 50%;
       }
+
+      /* Loading Overlay */
+      #pageLoading {
+        position: fixed;
+        inset: 0;
+        background: white;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
     </style>
   </head>
   <body class="flex items-center justify-center min-h-screen p-4 relative">
+    <div id="pageLoading">
+      <div
+        class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"
+      ></div>
+      <div class="text-sm font-bold text-slate-500 tracking-widest uppercase">
+        កំពុងទាញយកវិក្កយបត្រ...
+      </div>
+    </div>
+
     <a
-      href="dashboard.html"
+      href="#"
+      id="backBtn"
+      onclick="goBack()"
       class="absolute top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 transition"
     >
       <svg
@@ -81,7 +102,8 @@
     </a>
 
     <div
-      class="bg-white w-full max-w-4xl rounded-[24px] shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-100"
+      class="bg-white w-full max-w-4xl rounded-[24px] shadow-2xl flex flex-col md:flex-row overflow-hidden border border-slate-100 hidden"
+      id="mainContainer"
     >
       <div
         class="bg-[#0B1120] text-white p-8 md:w-1/3 flex flex-col justify-between relative overflow-hidden"
@@ -109,19 +131,21 @@
           <div class="space-y-4 text-sm text-slate-300 font-medium">
             <div class="flex justify-between border-b border-slate-800 pb-2">
               <span>លេខកក់ (Ref):</span>
-              <span class="text-white font-mono">BK-102-B02</span>
+              <span class="text-white font-mono" id="disp_ref">---</span>
             </div>
             <div class="flex justify-between border-b border-slate-800 pb-2">
               <span>បន្ទប់:</span>
-              <span class="text-white font-bold text-blue-400">B02</span>
+              <span class="text-white font-bold text-blue-400" id="disp_room"
+                >---</span
+              >
             </div>
             <div class="flex justify-between border-b border-slate-800 pb-2">
               <span>ឈ្មោះភ្ញៀវ:</span>
-              <span class="text-white uppercase">Sok Dara</span>
+              <span class="text-white uppercase" id="disp_name">---</span>
             </div>
             <div class="flex justify-between pb-2">
               <span>រយៈពេលស្នាក់នៅ:</span>
-              <span class="text-white">24.0 ម៉ោង</span>
+              <span class="text-white" id="disp_duration">--- ម៉ោង</span>
             </div>
           </div>
         </div>
@@ -132,7 +156,9 @@
           <div class="text-[11px] text-slate-300 font-bold uppercase mb-1">
             Total Amount Due
           </div>
-          <div class="text-4xl font-black text-emerald-400">$15.00</div>
+          <div class="text-4xl font-black text-emerald-400" id="disp_total">
+            $0.00
+          </div>
         </div>
       </div>
 
@@ -179,11 +205,11 @@
               class="bg-white p-4 inline-block rounded-[1.5rem] border-2 border-slate-100 shadow-xl relative transform transition hover:scale-105"
             >
               <img
-                src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=100000005%3A15.00%3ABK-102-B02&color=0B1120"
+                id="qrImage"
+                src=""
                 alt="Payment QR"
-                class="rounded-xl"
+                class="rounded-xl w-[200px] h-[200px]"
               />
-
               <div
                 class="absolute inset-0 bg-white/90 rounded-[1.2rem] flex flex-col items-center justify-center hidden backdrop-blur-sm"
                 id="qrLoadingOverlay"
@@ -219,7 +245,9 @@
                 >
                   ទឹកប្រាក់ (Amount)
                 </div>
-                <div class="text-emerald-600 font-black text-sm">$15.00</div>
+                <div class="text-emerald-600 font-black text-sm" id="qrAmount">
+                  $0.00
+                </div>
               </div>
             </div>
           </div>
@@ -268,7 +296,6 @@
                     required
                   />
                 </div>
-
                 <div>
                   <label
                     class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5"
@@ -283,7 +310,6 @@
                     required
                   />
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label
@@ -335,7 +361,7 @@
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 ></path>
               </svg>
-              ទូទាត់ប្រាក់ឥឡូវនេះ (Pay $15.00)
+              ទូទាត់ប្រាក់ឥឡូវនេះ (<span id="btnAmount">$0.00</span>)
             </button>
           </form>
         </div>
@@ -343,6 +369,112 @@
     </div>
 
     <script>
+      // ==========================================
+      // 1. Setup & Get Booking Data from API
+      // ==========================================
+      const urlParams = new URLSearchParams(window.location.search);
+      const bookingId = urlParams.get("id");
+      const userRole = localStorage.getItem("user_role") || "tenant";
+
+      let currentTotal = 0;
+      let shortCode = "";
+
+      function goBack() {
+        window.location.href =
+          userRole === "admin" ? "admin.html" : "dashboard.html";
+      }
+
+      async function loadBookingInfo() {
+        if (!bookingId) {
+          Swal.fire({
+            icon: "error",
+            title: "បរាជ័យ",
+            text: "រកមិនឃើញវិក្កយបត្រនេះទេ!",
+          }).then(() => goBack());
+          return;
+        }
+
+        try {
+          // ទាញយកទិន្នន័យ Booking ពីម៉ាស៊ីនមេ
+          const res = await fetch("/api/bookings");
+          const bookings = await res.json();
+          const b = bookings.find((x) => x._id === bookingId);
+
+          if (!b) {
+            Swal.fire({
+              icon: "error",
+              title: "បរាជ័យ",
+              text: "វិក្កយបត្រមិនត្រឹមត្រូវ ឬត្រូវបានលុបចោល។",
+            }).then(() => goBack());
+            return;
+          }
+
+          // បើបង់រួចហើយ មិនបាច់ឱ្យបង់ទៀតទេ
+          if (b.payment_status === "paid") {
+            Swal.fire({
+              icon: "info",
+              title: "រួចរាល់",
+              text: "វិក្កយបត្រនេះត្រូវបានទូទាត់រួចរាល់ហើយ។",
+            }).then(() => goBack());
+            return;
+          }
+
+          // គណនាតម្លៃ
+          let hours =
+            Math.abs(new Date(b.check_out_time) - new Date(b.check_in_time)) /
+            36e5;
+          currentTotal = (hours / 24) * b.room_id.price;
+          let shortId = b._id.substring(b._id.length - 6).toUpperCase();
+          shortCode = `BK-${shortId}-${b.room_id.room_number}`;
+
+          // បង្ហាញលើ UI
+          document.getElementById("disp_ref").innerText = shortCode;
+          document.getElementById("disp_room").innerText =
+            b.room_id.room_number;
+          document.getElementById("disp_name").innerText = b.tenant_name;
+          document.getElementById("disp_duration").innerText =
+            `${hours.toFixed(0)} ម៉ោង`;
+
+          let priceStr = `$${currentTotal.toFixed(2)}`;
+          document.getElementById("disp_total").innerText = priceStr;
+          document.getElementById("qrAmount").innerText = priceStr;
+          document.getElementById("btnAmount").innerText = priceStr;
+
+          // Generate U-Pay QR String Format (Account : Amount : Description)
+          let qrString = `100000005:${currentTotal.toFixed(2)}:${shortCode}`;
+          document.getElementById("qrImage").src =
+            `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrString)}&color=0B1120`;
+
+          // បិទ Loading លោតចេញផ្ទាំងពេញ
+          document.getElementById("pageLoading").style.display = "none";
+          document.getElementById("mainContainer").classList.remove("hidden");
+
+          // ចាប់ផ្តើមរង់ចាំចាប់យកការទូទាត់ពី U-Pay
+          initPaymentListener();
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "បញ្ហាប្រព័ន្ធ",
+            text: "មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ។",
+          }).then(() => goBack());
+        }
+      }
+
+      // ==========================================
+      // 2. ការអាប់ដេតចូល Database (ម៉ាកថា "បង់លុយរួច")
+      // ==========================================
+      async function updateDatabasePayment(method) {
+        try {
+          await fetch("/api/payments/confirm", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ booking_id: bookingId, method: method }),
+          });
+        } catch (err) {
+          console.error("Failed to update DB:", err);
+        }
+      }
+
       // --- មុខងារដូរ Tab ---
       function switchPaymentTab(tabId) {
         document
@@ -353,17 +485,16 @@
         document
           .querySelectorAll(".tab-content")
           .forEach((content) => content.classList.remove("active"));
-
-        let targetBtn = document.getElementById("tab-" + tabId);
-        targetBtn.classList.add("active", "bg-[#0B1120]", "text-white");
+        document
+          .getElementById("tab-" + tabId)
+          .classList.add("active", "bg-[#0B1120]", "text-white");
         document.getElementById("content-" + tabId).classList.add("active");
       }
 
       // ==========================================
-      // 🔥 AUTO-FORMATTING FOR CREDIT CARD
+      // 3. ក្លែងធ្វើការកាត់លុយតាមកាត (Card Payment)
       // ==========================================
       document.addEventListener("DOMContentLoaded", () => {
-        // 1. លេខកាត៖ ដកឃ្លារាល់ ៤ ខ្ទង់ និងការពារមិនឱ្យវាយអក្សរ
         const cardNumInput = document.getElementById("card-num");
         if (cardNumInput) {
           cardNumInput.addEventListener("input", function (e) {
@@ -373,8 +504,6 @@
               .trim();
           });
         }
-
-        // 2. ថ្ងៃផុតកំណត់៖ ថែមសញ្ញា / ស្វ័យប្រវត្តិ
         const cardExpInput = document.getElementById("card-exp");
         if (cardExpInput) {
           cardExpInput.addEventListener("input", function (e) {
@@ -388,8 +517,6 @@
             e.target.value = val;
           });
         }
-
-        // 3. លេខសម្ងាត់ CVC: អនុញ្ញាតតែលេខ
         const cardCvvInput = document.getElementById("card-cvv");
         if (cardCvvInput) {
           cardCvvInput.addEventListener("input", function (e) {
@@ -398,52 +525,40 @@
         }
       });
 
-      // --- មុខងារក្លែងធ្វើការកាត់លុយតាមកាត (Card Payment Simulation) ---
       function processCardPayment(e) {
-        e.preventDefault(); // ទប់កុំឱ្យ Form Submit ភ្លាមៗ
-
-        // 🔥 ពិនិត្យមើលលក្ខខណ្ឌមុននឹងអនុញ្ញាតឱ្យកាត់លុយ
+        e.preventDefault();
         const cardNum = document
           .getElementById("card-num")
           .value.replace(/\s/g, "");
-        const cardExp = document.getElementById("card-exp").value;
-        const cardCvv = document.getElementById("card-cvv").value;
-
-        if (cardNum.length < 15 || cardExp.length < 5 || cardCvv.length < 3) {
+        if (cardNum.length < 15)
           return Swal.fire({
             icon: "warning",
-            title: "ព័ត៌មានកាតមិនពេញលេញ",
-            text: "សូមពិនិត្យមើលលេខកាត ថ្ងៃផុតកំណត់ និងលេខ CVC របស់អ្នកម្តងទៀត!",
+            title: "ព័ត៌មានកាតមិនត្រឹមត្រូវ",
             confirmButtonColor: "#0B1120",
           });
-        }
 
         let btn = document.getElementById("btnSubmitCard");
-        // ដូរ UI ប៊ូតុងទៅជា Loading
         btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> កំពុងដំណើរការកាត់ប្រាក់...`;
-        btn.classList.add("opacity-80", "cursor-not-allowed");
         btn.disabled = true;
 
-        // ក្លែងធ្វើរង់ចាំ ៣ វិនាទី ដូចការកាត់លុយពីធនាគារពិតៗ
-        setTimeout(() => {
+        setTimeout(async () => {
+          // 👉 ប្រាប់ទៅកាន់ Database ថាបង់រួចហើយ តាមរយៈកាត
+          await updateDatabasePayment("card");
+
           Swal.fire({
             icon: "success",
             title: "ទូទាត់តាមកាតជោគជ័យ!",
-            text: "ប្រាក់ $15.00 ត្រូវបានកាត់ចេញពីកាតរបស់អ្នក។",
+            text: `ប្រាក់ $${currentTotal.toFixed(2)} ត្រូវបានកាត់ចេញពីកាតរបស់អ្នក។`,
             confirmButtonColor: "#10B981",
-            confirmButtonText: "ត្រឡប់ទៅផ្ទាំងដើម",
             allowOutsideClick: false,
           }).then((result) => {
-            if (result.isConfirmed) {
-              // លោតទៅកាន់ Dashboard ជំនួសឱ្យការ Submit ចូល Database (SPA)
-              window.location.href = "dashboard.html";
-            }
+            if (result.isConfirmed) goBack();
           });
-        }, 3000);
+        }, 2000);
       }
 
       // ==========================================
-      // 🔥 AUTO DETECT PAYMENT VIA API (POLLING) សម្រាប់ U-Pay
+      // 4. AUTO DETECT PAYMENT VIA API (U-Pay Polling)
       // ==========================================
       let paymentPollingInterval = null;
       let initialTrxCount = 0;
@@ -454,21 +569,18 @@
         try {
           const res = await fetch(API_URL);
           const users = await res.json();
-
           const urentalAcc = users.find(
             (u) =>
               u.accountNumber === targetAccount || u.username === "U-RENTAL",
           );
 
           if (urentalAcc && urentalAcc.transactions) {
-            initialTrxCount = urentalAcc.transactions.length;
+            initialTrxCount = urentalAcc.transactions.length; // កត់ត្រាចំនួន Transaction ដំបូង
           }
 
           if (paymentPollingInterval) clearInterval(paymentPollingInterval);
-          paymentPollingInterval = setInterval(checkIncomingPayment, 3000);
-        } catch (err) {
-          console.log("API Init Error:", err);
-        }
+          paymentPollingInterval = setInterval(checkIncomingPayment, 3000); // ឆែករៀងរាល់ ៣ វិនាទី
+        } catch (err) {}
       }
 
       async function checkIncomingPayment() {
@@ -481,29 +593,30 @@
           );
 
           if (urentalAcc && urentalAcc.transactions) {
+            // បើចំនួន Transaction កើនឡើង ធំជាងចំនួនដំបូង មានន័យថាមានគេបាញ់លុយចូលហើយ
             if (urentalAcc.transactions.length > initialTrxCount) {
               const latestTrx = urentalAcc.transactions[0];
 
               if (latestTrx.amount > 0) {
-                clearInterval(paymentPollingInterval);
+                clearInterval(paymentPollingInterval); // បញ្ឈប់ការឆែក
 
                 document
                   .getElementById("qrLoadingOverlay")
                   .classList.remove("hidden");
 
+                // 👉 ប្រាប់ទៅកាន់ Database ថាបង់រួចហើយ តាមរយៈ U-Pay (Online)
+                await updateDatabasePayment("online");
+
                 setTimeout(() => {
                   Swal.fire({
                     icon: "success",
                     title: "ទទួលបានប្រាក់ជោគជ័យ!",
-                    html: `ប្រព័ន្ធបានទូទាត់ប្រាក់ <b>$${latestTrx.amount}</b> រួចរាល់។`,
+                    html: `ប្រព័ន្ធ U-Pay បានទូទាត់ប្រាក់ <b>$${latestTrx.amount}</b> រួចរាល់។`,
                     confirmButtonColor: "#10B981",
-                    confirmButtonText: "ត្រឡប់ទៅផ្ទាំងដើម",
+                    confirmButtonText: "ត្រឡប់ទៅកាន់ផ្ទាំងដើម",
                     allowOutsideClick: false,
                   }).then((result) => {
-                    if (result.isConfirmed) {
-                      // លោតទៅកាន់ Dashboard ជំនួសឱ្យការ Submit (SPA)
-                      window.location.href = "dashboard.html";
-                    }
+                    if (result.isConfirmed) goBack();
                   });
                 }, 1000);
               } else {
@@ -511,18 +624,11 @@
               }
             }
           }
-        } catch (err) {
-          console.log("Polling Error:", err);
-        }
+        } catch (err) {}
       }
 
-      document.getElementById("tab-qr").addEventListener("click", () => {
-        initPaymentListener();
-      });
-
-      window.addEventListener("load", () => {
-        initPaymentListener();
-      });
+      // ចាប់ផ្តើមដំណើរការ
+      window.addEventListener("load", loadBookingInfo);
     </script>
   </body>
 </html>
