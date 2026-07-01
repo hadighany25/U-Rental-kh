@@ -2,7 +2,7 @@ name: Fly Deploy
 on:
   push:
     branches:
-      - main # ឬ master អាស្រ័យលើឈ្មោះ Branch របស់អ្នក
+      - main
 
 jobs:
   deploy:
